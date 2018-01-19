@@ -165,9 +165,9 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		return this.isGyroRotation() ? /* TODO latest pid out */ 0.0 : Robot.getInstance().getOI().getRotationX();
 	}
 
-	public double getRotationTargetAngle() {
-		return isFixedTargetRotation() ? this.autoRotationTargetAngle : Robot.getInstance().getOI().getRotationAngle();
-	}
+	//public double getRotationTargetAngle() {
+	//	return isFixedTargetRotation() ? this.autoRotationTargetAngle : Robot.getInstance().getOI().getRotationAngle();
+	//}
 
 	/**
 	 * @return the current gyro angle.

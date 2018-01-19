@@ -1,14 +1,26 @@
 package org.usfirst.frc.team2357.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 /**
  * This class is the glue that binds the controls on the physical operator
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-	Joystick moveStick = new Joystick(RobotMap.MOVE_STICK);
-	Joystick rotateStick = new Joystick(RobotMap.ROTATE_STICK);
+	private XboxController driveController = new XboxController(0);
+	private Button a = new JoystickButton(driveController, 1);
+	private Button b = new JoystickButton(driveController, 2);
+	private Button x = new JoystickButton(driveController, 3);
+	private Button y = new JoystickButton(driveController, 4);
+	private Button leftBumper = new JoystickButton(driveController, 5);
+	private Button rightBumper = new JoystickButton(driveController, 6);
+	private Button backButton = new JoystickButton(driveController, 7);
+	private Button startButton = new JoystickButton(driveController, 8);
+	private Button leftStickButton = new JoystickButton(driveController, 9);
+	private Button rightStickButton = new JoystickButton(driveController, 10);
 
 	public OI() {
 	}
@@ -18,7 +30,7 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no Y movement.
 	 */
 	public double getYMoveValue() {
-		return moveStick.getY();
+		return driveController.getY(Hand.kLeft);
 	}
 
 	/**
@@ -26,7 +38,7 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no X movement.
 	 */
 	public double getXMoveValue() {
-		return moveStick.getX();
+		return driveController.getX(Hand.kLeft);
 	}
 
 	/**
@@ -34,7 +46,7 @@ public class OI {
 	 *         0.0 is no rotation.
 	 */
 	public double getRotationX() {
-		return rotateStick.getX();
+		return driveController.getX(Hand.kRight);
 	}
 
 	/**
@@ -43,8 +55,4 @@ public class OI {
 	 *         axis. This value will likely need to be rotated depending on the
 	 *         physical orientation of the gyro on the robot.
 	 */
-	public double getRotationAngle() {
-		// TODO check stick inputs, gyro 0 direction and rework this math.
-		return Math.atan2(-rotateStick.getY(), rotateStick.getX());
-	}
 }
