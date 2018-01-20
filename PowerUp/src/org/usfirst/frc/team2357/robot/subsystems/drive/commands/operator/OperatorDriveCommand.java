@@ -30,4 +30,16 @@ public class OperatorDriveCommand extends AbstractDriveCommand {
 	protected double getNextX() {
 		return oi.getXMoveValue();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * This implementation returns the rotation stick X value from {@link OI}.
+	 * </p>
+	 */
+	@Override
+	protected double getNextStickManualRotation() {
+		return oi.getRotationX();
+	}
 }

@@ -22,6 +22,8 @@ public class OI {
 	private Button leftStickButton = new JoystickButton(driveController, 9);
 	private Button rightStickButton = new JoystickButton(driveController, 10);
 
+	private static final double STICK_ROTATION_MIN_DEFLECTION = 0.1;
+
 	public OI() {
 	}
 
@@ -46,7 +48,11 @@ public class OI {
 	 *         0.0 is no rotation.
 	 */
 	public double getRotationX() {
-		return driveController.getX(Hand.kRight);
+		double rotation = driveController.getX(Hand.kRight);
+		if (Math.abs(rotation) < STICK_ROTATION_MIN_DEFLECTION) {
+			rotation = 0.0;
+		}
+		return rotation;
 	}
 
 	/**

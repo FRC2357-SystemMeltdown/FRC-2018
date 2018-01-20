@@ -10,9 +10,9 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.Operato
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
@@ -22,29 +22,63 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
  * feedback sensors.
  */
 public class DriveSubsystem extends Subsystem implements PIDOutput {
+	/**
+	 * Values determine the Cartesian movement of the robot. Rotation is derived
+	 * separately depending on user input of fixed headings or manual rotation stick
+	 * input.
+	 */
 	public enum DriveMode {
 		/**
 		 * Cartesian movement is relative to the front of the robot with the X and Y
-		 * components derived from the position of the movement stick. Rotation is
-		 * proportional to the X axis deflection of the rotation stick. There is no PID
-		 * control.
+		 * components derived from the position of the movement stick.
 		 */
 		ROBOT_RELATIVE,
 
 		/**
 		 * Cartesian movement is relative to the field with the X and Y components
-		 * derived from the position of the movement stick. The PID controlled
-		 * rotational target angle is derived from D-pad ordinal input or non-PID
-		 * controlled X deflection of the rotation stick.
+		 * derived from the position of the movement stick.
 		 */
-		FIELD_RELATIVE,
+		FIELD_RELATIVE;
+	}
+
+	/**
+	 * Driver station view relative orientations for the intake.
+	 */
+	public enum FixedIntakeDirection {
+		/**
+		 * Intake up field away from our driver station.
+		 */
+		UP_FIELD(0.0),
 
 		/**
-		 * Cartesian movement is relative to the field with the X and Y components
-		 * explicitly fed from an autonomous routine. The PID controlled rotational
-		 * target angle is explicitly fed from an autonomous routine.
+		 * Intake toward the right of the field.
 		 */
-		AUTO;
+		RIGHT(90.0),
+
+		/**
+		 * Intake down field toward our driver station.
+		 */
+		DOWN_FIELD(180.0),
+
+		/**
+		 * Intake toward the left of the field.
+		 */
+		LEFT(-90.0);
+
+		private final double heading;
+
+		private FixedIntakeDirection(double heading) {
+			this.heading = heading;
+		}
+
+		/**
+		 * Return the desired gyro angle for this heading.
+		 * 
+		 * @return return the desired gyro angle for this heading.
+		 */
+		public double getHeading() {
+			return this.heading;
+		}
 	}
 
 	private final WPI_TalonSRX frontLeftMotor = new WPI_TalonSRX(RobotMap.FRONT_LEFT_MOTOR);
@@ -56,22 +90,21 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 
 	private final DriveProperties props = new DriveProperties();
 
-	private DriveMode driveMode = DriveMode.AUTO;
-	private double autoRotationTargetAngle = 0.0;
+	/*
+	 * Initialize for tele-op. Autonomous mode will set as needed. Autonomous will
+	 * end by setting field relative and its last fixed heading.
+	 * 
+	 * We cannot initialize here for auto since the proper fixed heading could be
+	 * different for each one.
+	 */
+	private DriveMode driveMode = DriveMode.FIELD_RELATIVE;
+	private boolean stickRotationDetected = true;
+	private FixedIntakeDirection fixedIntakeDirection = null;
+	private double lastPIDOutput = 0.0;
 
-	private boolean stickRotationDetected = false;
-	private double autoOrDpadRotationAngle = 0.0;
-
-	private AHRS gyro = new AHRS(Port.kUSB);
+	private AHRS gyro = new AHRS(I2C.Port.kOnboard);
 
 	private final PIDController rotationController;
-	// TODO add pid controller for gyro turns
-	// TODO always enabled
-	// TODO auto or D pad input for ordinal directions
-	// TODO pid keeps us on latest
-	// TODO if rot stick input ignore pid output
-	// TODO do not use pid output again until new input from D pad
-	// TODO rot stick input rotates based on X deflection
 
 	/**
 	 * Registers with the configuration subsystem (drive properties set at this
@@ -84,17 +117,14 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 
 		rotationController = new PIDController(props.rotatePIDp, props.rotatePIDi, props.rotatePIDd, 0.0, this.gyro,
 				this, 0.01);
-		rotationController.setInputRange(0.0, 360.0);
+		rotationController.setInputRange(-180.0, 180.0);
 		rotationController.setOutputRange(-0.7, 0.7);
 		rotationController.setAbsoluteTolerance(props.rotatePIDTolerance);
 		rotationController.setContinuous(true);
-		rotationController.reset();
-		rotationController.enable();
 	}
 
 	/**
-	 * The operator drive control mode is configurable. See
-	 * {@link DriveProperties#DRIVE_MODE_KEY} for details.
+	 * {@inheritDoc}
 	 */
 	public void initDefaultCommand() {
 		setDefaultCommand(new OperatorDriveCommand());
@@ -123,24 +153,36 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	}
 
 	/**
-	 * @return true if robot motion is field relative and false if robot relative.
+	 * Returns the current {@link FixedIntakeDirection} which could be null if
+	 * manually turning.
+	 * 
+	 * @return the current {@link FixedIntakeDirection} which could be null.
 	 */
-	public boolean isFieldRelative() {
-		return this.getDriveMode() != DriveMode.ROBOT_RELATIVE;
+	public FixedIntakeDirection getFixedIntakeDirection() {
+		return this.fixedIntakeDirection;
 	}
 
 	/**
-	 * @return true if rotation uses gyro and pid and false if x magnitude only.
+	 * Sets the {@link FixedIntakeDirection}. The value will only be changed and the
+	 * rotation controller configured if the value is different than the current
+	 * setting. If set to null the controller is reset and stick rotation turned on.
+	 * If set to a fixed direction, the controller is reset, enabled and stick
+	 * rotation turned off.
+	 * 
+	 * @param fid
+	 *            the desired {@link FixedIntakeDirection}.
 	 */
-	public boolean isGyroRotation() {
-		return this.getDriveMode() != DriveMode.ROBOT_RELATIVE;
-	}
-
-	/**
-	 * @return true if the gyro guided rotation is fixed and not stick derived.
-	 */
-	public boolean isFixedTargetRotation() {
-		return this.getDriveMode() == DriveMode.AUTO;
+	public void setFixedIntakeDirection(FixedIntakeDirection fid) {
+		if (this.fixedIntakeDirection != fid) {
+			this.fixedIntakeDirection = fid;
+			this.rotationController.reset();
+			if (this.fixedIntakeDirection != null) {
+				this.stickRotationDetected = false;
+				this.rotationController.enable();
+			} else {
+				this.stickRotationDetected = true;
+			}
+		}
 	}
 
 	/**
@@ -156,37 +198,45 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 * @param xSpeed
 	 *            The robot's speed along the X axis [-1.0..1.0]. Forward is
 	 *            positive.
+	 * @param manualStickRotation
+	 *            If non-zero, manual rotation mode will be entered and the fixed
+	 *            rotation control turned off.
 	 */
-	public void cartesianDrive(double ySpeed, double xSpeed) {
-		this.mecanumDrive.driveCartesian(ySpeed, xSpeed, getRotationValue(),
-				this.isFieldRelative() ? getGyroAngle() : 0.0);
+	public void cartesianDrive(double ySpeed, double xSpeed, double manualStickRotation) {
+		if (manualStickRotation != 0.0) {
+			this.setFixedIntakeDirection(null);
+			this.stickRotationDetected = true;
+		}
+		double rotation = 0.0;
+		if (this.stickRotationDetected) {
+			rotation = manualStickRotation;
+		} else if (this.fixedIntakeDirection != null) {
+			rotation = this.lastPIDOutput;
+		}
+		this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation,
+				this.driveMode == DriveMode.FIELD_RELATIVE ? this.getGyroYaw() : 0.0);
 	}
-
-	public double getRotationValue() {
-		// TODO implement gyro pid
-		return this.isGyroRotation() ? /* TODO latest pid out */ 0.0 : Robot.getInstance().getOI().getRotationX();
-	}
-
-	//public double getRotationTargetAngle() {
-	//	return isFixedTargetRotation() ? this.autoRotationTargetAngle : Robot.getInstance().getOI().getRotationAngle();
-	//}
 
 	/**
-	 * @return the current gyro angle.
+	 * @return the current gyro yaw.
 	 */
-	public double getGyroAngle() {
-		// TODO read the gyro
-		return 0.0;
+	public double getGyroYaw() {
+		return this.gyro.getYaw();
 	}
 
+	/**
+	 * @return the configured initial drive mode for tele-op.
+	 */
 	public DriveMode getInitialTeleDriveMode() {
 		return props.initialTeleDriveMode;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void pidWrite(double output) {
-		// TODO Auto-generated method stub
-
+		this.lastPIDOutput = output;
 	}
 
 	/**

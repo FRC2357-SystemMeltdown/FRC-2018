@@ -7,7 +7,7 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.AbstractDriveCom
  * Base class for all autonomous drive commands.
  */
 public abstract class AbstractAutoDriveCommand extends AbstractDriveCommand {
-	private DriveMode priorDriveMode = DriveMode.AUTO;
+	private DriveMode priorDriveMode;
 
 	/**
 	 * Drives until interrupted or drives for the specified seconds.
@@ -33,7 +33,7 @@ public abstract class AbstractAutoDriveCommand extends AbstractDriveCommand {
 	protected void initialize() {
 		super.initialize();
 		this.priorDriveMode = this.driveSubsystem.getDriveMode();
-		this.driveSubsystem.setDriveMode(DriveMode.AUTO);
+		this.driveSubsystem.setDriveMode(DriveMode.FIELD_RELATIVE);
 	}
 
 	/**

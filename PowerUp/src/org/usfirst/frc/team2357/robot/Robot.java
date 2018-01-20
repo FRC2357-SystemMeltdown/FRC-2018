@@ -212,7 +212,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		this.getDriveSubsystem().setDriveMode(DriveMode.AUTO);
+		this.getDriveSubsystem().setDriveMode(DriveMode.FIELD_RELATIVE);
 		this.getAutonomousSubsystem().autonomousInit();
 	}
 

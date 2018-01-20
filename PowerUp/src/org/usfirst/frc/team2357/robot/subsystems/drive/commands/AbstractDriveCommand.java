@@ -67,6 +67,15 @@ public abstract class AbstractDriveCommand extends AbstractStateCommand {
 	protected abstract double getNextX();
 
 	/**
+	 * Subclasses want to read sticks to support manual rotation must override this.
+	 * 
+	 * @return the next manual stick derived rotation value.
+	 */
+	protected double getNextStickManualRotation() {
+		return 0.0;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 * <p>
@@ -90,7 +99,7 @@ public abstract class AbstractDriveCommand extends AbstractStateCommand {
 	 */
 	protected void execute() {
 		super.execute();
-		this.driveSubsystem.cartesianDrive(getNextY(), getNextX());
+		this.driveSubsystem.cartesianDrive(getNextY(), getNextX(), getNextStickManualRotation());
 	}
 
 	/**
