@@ -84,10 +84,12 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 
 		rotationController = new PIDController(props.rotatePIDp, props.rotatePIDi, props.rotatePIDd, 0.0, this.gyro,
 				this, 0.01);
-		rotationController.setInputRange(-180.0, 180.0);
-		rotationController.setOutputRange(-1.0, 1.0);
+		rotationController.setInputRange(0.0, 360.0);
+		rotationController.setOutputRange(-0.7, 0.7);
 		rotationController.setAbsoluteTolerance(props.rotatePIDTolerance);
 		rotationController.setContinuous(true);
+		rotationController.reset();
+		rotationController.enable();
 	}
 
 	/**
