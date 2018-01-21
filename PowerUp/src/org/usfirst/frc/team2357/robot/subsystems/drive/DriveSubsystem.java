@@ -7,6 +7,8 @@ import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubs
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationUtilities;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.OperatorDriveCommand;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -121,6 +123,17 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		rotationController.setOutputRange(-0.7, 0.7);
 		rotationController.setAbsoluteTolerance(props.rotatePIDTolerance);
 		rotationController.setContinuous(true);
+
+		configMotor(frontLeftMotor);
+		configMotor(frontRightMotor);
+		configMotor(backLeftMotor);
+		configMotor(backRightMotor);
+	}
+
+	private void configMotor(WPI_TalonSRX talon) {
+		talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+		talon.configAllowableClosedloopError(0, this.props.positionDrivePIDokError, 0);
+		talon.config_kP(0, this.props.positionDrivePIDp, 0);
 	}
 
 	/**
@@ -239,6 +252,48 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		this.lastPIDOutput = output;
 	}
 
+	/* START DRIVE FIXED DISTANCE FUNCTIONS */
+
+	/**
+	 * Uses the CANTalon on-board pid to move a number of inches.
+	 * 
+	 * @param inches
+	 *            the number of inches to move forward (negative for backward).
+	 */
+	public void startMoveInches(double inches) {
+		double revs = (inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
+				* this.props.encoderClicksPerRev;
+		this.enablePositionalDrive(revs);
+	}
+
+	private void enablePositionalDrive(double revs) {
+		// TODO Decide if all positional or one positional and others follow.
+		// TODO Would master/follower be better for turn and drive?
+		// TODO Perhaps select different corner to be master?
+		enablePositionalDrive(this.frontLeftMotor, revs);
+		enablePositionalDrive(this.frontRightMotor, revs);
+		enablePositionalDrive(this.backLeftMotor, revs);
+		enablePositionalDrive(this.backRightMotor, revs);
+	}
+
+	private void enablePositionalDrive(WPI_TalonSRX motor, double revs) {
+		motor.set(ControlMode.Position, revs);
+		motor.getSensorCollection().setQuadraturePosition(0, 0);
+	}
+
+	public boolean isPositionOnTarget() {
+		return ((Math.abs(this.frontLeftMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
+				&& (Math.abs(this.frontRightMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
+				&& (Math.abs(this.backLeftMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
+				&& (Math.abs(this.backRightMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError));
+	}
+
+	public void stopMoveInches() {
+		this.stop();
+	}
+
+	/* END DRIVE FIXED DISTANCE FUNCTIONS */
+
 	/**
 	 * An instance of this class is used by the {@link DriveSubsystem} to manage the
 	 * drive properties using the {@link ConfigurationSubsystem}.
@@ -302,6 +357,38 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		private double rotatePIDd = ROTATE_PID_D_DEFAULT;
 
 		/**
+		 * This is the effective circumference of the wheels. It is used as part of the
+		 * encoder based position control. The value must be parseable into a double via
+		 * {@link Double#parseDouble(String)} or the default value will be used.
+		 */
+		public static final String EFFECTIVE_WHEEL_CIRCUMFERENCE_KEY = "drive.effective.wheel.circumference";
+		public static final double EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT = 18.85;
+		private double effectiveWheelCircumference = EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT;
+
+		/**
+		 * This is the effective number of encoder revolutions per wheel revolution. It
+		 * is based on gear ratios between the wheels and the encode. It is used as part
+		 * of the encoder based position control. The value must be parseable into a
+		 * double via {@link Double#parseDouble(String)} or the default value will be
+		 * used.
+		 */
+		public static final String EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_KEY = "drive.effective.encoder.rev.per.wheel.rev";
+		public static final double EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT = 1.0;
+		private double effectiveEncoderRevPerWheelRev = EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT;
+
+		public static final String ENCODER_CLICKS_PER_REV_KEY = "drive.encoder.clicks.per.rev";
+		public static final double ENCODER_CLICKS_PER_REV_DEFAULT = 256.0;
+		private double encoderClicksPerRev = ENCODER_CLICKS_PER_REV_DEFAULT;
+		
+		public static final String POSITION_DRIVE_PID_P_KEY = "drive.position.pid.p";
+		public static final double POSITION_DRIVE_PID_P_DEFAULT = 0.5;
+		private double positionDrivePIDp = POSITION_DRIVE_PID_P_DEFAULT;
+		
+		public static final String POSITION_DRIVE_PID_OK_ERROR_KEY = "drive.position.pid.ok.error";
+		public static final int POSITION_DRIVE_PID_OK_ERROR_DEFAULT = 50;
+		private int positionDrivePIDokError = POSITION_DRIVE_PID_OK_ERROR_DEFAULT;
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -315,6 +402,13 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 			this.rotatePIDp = ConfigurationUtilities.getProperty(config, ROTATE_PID_P_KEY, ROTATE_PID_P_DEFAULT);
 			this.rotatePIDi = ConfigurationUtilities.getProperty(config, ROTATE_PID_I_KEY, ROTATE_PID_I_DEFAULT);
 			this.rotatePIDd = ConfigurationUtilities.getProperty(config, ROTATE_PID_D_KEY, ROTATE_PID_D_DEFAULT);
+
+			this.effectiveWheelCircumference = ConfigurationUtilities.getProperty(config,
+					EFFECTIVE_WHEEL_CIRCUMFERENCE_KEY, EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT);
+			this.effectiveEncoderRevPerWheelRev = ConfigurationUtilities.getProperty(config,
+					EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_KEY, EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT);
+			this.encoderClicksPerRev = ConfigurationUtilities.getProperty(config, ENCODER_CLICKS_PER_REV_KEY,
+					ENCODER_CLICKS_PER_REV_DEFAULT);
 		}
 	}
 }

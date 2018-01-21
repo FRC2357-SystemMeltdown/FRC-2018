@@ -6,8 +6,9 @@ import org.usfirst.frc.team2357.robot.Robot;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem;
 
 /**
- * Used to mecanum drive the robot with Cartesian y and x. The rotation value is
- * dependent on current {@link DriveSubsystem} settings and user input.
+ * Base class for all drive subsystem commands (operator and auto). Handles
+ * getting the {@link DriveSubsystem} and the {@link OI}. Also optionally
+ * manages a timeout.
  */
 public abstract class AbstractDriveCommand extends AbstractStateCommand {
 	/**
@@ -53,29 +54,6 @@ public abstract class AbstractDriveCommand extends AbstractStateCommand {
 	}
 
 	/**
-	 * Subclasses must implement to return the next Cartesian Y value.
-	 * 
-	 * @return the next Cartesian Y value.
-	 */
-	protected abstract double getNextY();
-
-	/**
-	 * Subclasses must implement to return the next Cartesian X value.
-	 * 
-	 * @return the next Cartesian X value.
-	 */
-	protected abstract double getNextX();
-
-	/**
-	 * Subclasses want to read sticks to support manual rotation must override this.
-	 * 
-	 * @return the next manual stick derived rotation value.
-	 */
-	protected double getNextStickManualRotation() {
-		return 0.0;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 * <p>
@@ -88,18 +66,6 @@ public abstract class AbstractDriveCommand extends AbstractStateCommand {
 		if (timeoutSeconds != -1.0) {
 			setTimeout(timeoutSeconds);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * <p>
-	 * Drives the robot with the subclass supplied Cartesian x and y values.
-	 * </p>
-	 */
-	protected void execute() {
-		super.execute();
-		this.driveSubsystem.cartesianDrive(getNextY(), getNextX(), getNextStickManualRotation());
 	}
 
 	/**
