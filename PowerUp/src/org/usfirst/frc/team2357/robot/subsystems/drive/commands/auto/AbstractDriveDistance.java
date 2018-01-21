@@ -13,6 +13,7 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.AbstractDriveCom
  */
 public abstract class AbstractDriveDistance extends AbstractAutoDriveCommand {
 	private final double inches;
+	private int targetClicks;
 
 	/**
 	 * Drives forever until the specified inches are reached.
@@ -48,14 +49,20 @@ public abstract class AbstractDriveDistance extends AbstractAutoDriveCommand {
 	 */
 	protected void initialize() {
 		super.initialize();
-		this.driveSubsystem.startMoveInches(this.inches);
+		this.targetClicks = this.driveSubsystem.startMoveInches(this.inches);
+	}
+
+	@Override
+	protected void execute() {
+		super.execute();
+		// TODO add code to drive without rotation on proper axis.
 	}
 
 	/**
 	 * Returns true if the inches have been moved or the timeout is hit.
 	 */
 	protected boolean isFinished() {
-		return this.driveSubsystem.isPositionOnTarget() || super.isFinished();
+		return this.driveSubsystem.isPositionOnTarget(this.targetClicks) || super.isFinished();
 	}
 
 	/**

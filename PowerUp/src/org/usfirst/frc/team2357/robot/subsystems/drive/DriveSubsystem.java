@@ -7,7 +7,6 @@ import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubs
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationUtilities;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.OperatorDriveCommand;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
@@ -130,10 +129,14 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		configMotor(backRightMotor);
 	}
 
+	/**
+	 * Used to configure each Talon. Not much here now, but may add more.
+	 * 
+	 * @param talon
+	 *            the Talon being configured.
+	 */
 	private void configMotor(WPI_TalonSRX talon) {
 		talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		talon.configAllowableClosedloopError(0, this.props.positionDrivePIDokError, 0);
-		talon.config_kP(0, this.props.positionDrivePIDp, 0);
 	}
 
 	/**
@@ -255,39 +258,65 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	/* START DRIVE FIXED DISTANCE FUNCTIONS */
 
 	/**
-	 * Uses the CANTalon on-board pid to move a number of inches.
+	 * Do not use the Talon on-board pid but do reset. We need to merge sensor on
+	 * the Rio.
 	 * 
 	 * @param inches
 	 *            the number of inches to move forward (negative for backward).
+	 * 
+	 * @return the number of encoder clicks to move. Feed this back to
+	 *         {@link #isPositionOnTarget(double)}.
 	 */
-	public void startMoveInches(double inches) {
-		double revs = (inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
-				* this.props.encoderClicksPerRev;
-		this.enablePositionalDrive(revs);
+	public int startMoveInches(double inches) {
+		enableMoveInches();
+		return (int) ((inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
+				* this.props.encoderClicksPerRev);
 	}
 
-	private void enablePositionalDrive(double revs) {
-		// TODO Decide if all positional or one positional and others follow.
-		// TODO Would master/follower be better for turn and drive?
-		// TODO Perhaps select different corner to be master?
-		enablePositionalDrive(this.frontLeftMotor, revs);
-		enablePositionalDrive(this.frontRightMotor, revs);
-		enablePositionalDrive(this.backLeftMotor, revs);
-		enablePositionalDrive(this.backRightMotor, revs);
+	/**
+	 * Sets up all the Talons for moving inches.
+	 */
+	private void enableMoveInches() {
+		enableMoveInches(this.frontLeftMotor);
+		enableMoveInches(this.frontRightMotor);
+		enableMoveInches(this.backLeftMotor);
+		enableMoveInches(this.backRightMotor);
 	}
 
-	private void enablePositionalDrive(WPI_TalonSRX motor, double revs) {
-		motor.set(ControlMode.Position, revs);
+	/**
+	 * For now just set counts to 0.
+	 * 
+	 * @param motor
+	 *            the Talon being set.
+	 */
+	private void enableMoveInches(WPI_TalonSRX motor) {
 		motor.getSensorCollection().setQuadraturePosition(0, 0);
 	}
 
-	public boolean isPositionOnTarget() {
-		return ((Math.abs(this.frontLeftMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
-				&& (Math.abs(this.frontRightMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
-				&& (Math.abs(this.backLeftMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError)
-				&& (Math.abs(this.backRightMotor.getClosedLoopError(0)) <= this.props.positionDrivePIDokError));
+	/**
+	 * Returns true if we have gone the number of clicks.
+	 * 
+	 * TODO for now this is true is more than one encoder says it is. We may need to
+	 * adjust.
+	 * 
+	 * @param targetClicks
+	 *            the calculated clicks from {@link #startMoveInches(double)}.
+	 * 
+	 * @return true if the robot has moved the number of clicks and false otherwise.
+	 */
+	public boolean isPositionOnTarget(int targetClicks) {
+		int onTarget = Math.abs(this.frontLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
+				: 0;
+		onTarget += Math.abs(this.frontRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
+				: 0;
+		onTarget += Math.abs(this.backLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
+		onTarget += Math.abs(this.backRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
+		return onTarget > 1;
 	}
 
+	/**
+	 * Stops the inches movement.
+	 */
 	public void stopMoveInches() {
 		this.stop();
 	}
@@ -379,14 +408,6 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		public static final String ENCODER_CLICKS_PER_REV_KEY = "drive.encoder.clicks.per.rev";
 		public static final double ENCODER_CLICKS_PER_REV_DEFAULT = 256.0;
 		private double encoderClicksPerRev = ENCODER_CLICKS_PER_REV_DEFAULT;
-		
-		public static final String POSITION_DRIVE_PID_P_KEY = "drive.position.pid.p";
-		public static final double POSITION_DRIVE_PID_P_DEFAULT = 0.5;
-		private double positionDrivePIDp = POSITION_DRIVE_PID_P_DEFAULT;
-		
-		public static final String POSITION_DRIVE_PID_OK_ERROR_KEY = "drive.position.pid.ok.error";
-		public static final int POSITION_DRIVE_PID_OK_ERROR_DEFAULT = 50;
-		private int positionDrivePIDokError = POSITION_DRIVE_PID_OK_ERROR_DEFAULT;
 
 		/**
 		 * {@inheritDoc}
