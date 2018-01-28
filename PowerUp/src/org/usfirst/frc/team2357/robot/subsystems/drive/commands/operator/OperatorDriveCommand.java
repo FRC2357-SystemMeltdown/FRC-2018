@@ -1,12 +1,12 @@
 package org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator;
 
 import org.usfirst.frc.team2357.robot.OI;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.AbstractDriveCommand;
 
 /**
- * Gets the Cartesian X and Y drive values from {@link OI}.
+ * Gets the Cartesian X and Y drive values and any manual rotation value from
+ * {@link OI}.
  */
-public class OperatorDriveCommand extends AbstractDriveCommand {
+public class OperatorDriveCommand extends AbstractOperatorDriveCommand {
 	/**
 	 * {@inheritDoc}
 	 * 

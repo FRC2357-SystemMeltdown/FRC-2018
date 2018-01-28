@@ -7,6 +7,7 @@ import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubs
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationUtilities;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.OperatorDriveCommand;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -121,6 +122,21 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		rotationController.setOutputRange(-0.7, 0.7);
 		rotationController.setAbsoluteTolerance(props.rotatePIDTolerance);
 		rotationController.setContinuous(true);
+
+		configMotor(frontLeftMotor);
+		configMotor(frontRightMotor);
+		configMotor(backLeftMotor);
+		configMotor(backRightMotor);
+	}
+
+	/**
+	 * Used to configure each Talon. Not much here now, but may add more.
+	 * 
+	 * @param talon
+	 *            the Talon being configured.
+	 */
+	private void configMotor(WPI_TalonSRX talon) {
+		talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 	}
 
 	/**
@@ -243,6 +259,74 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		this.lastPIDOutput = output;
 	}
 
+	/* START DRIVE FIXED DISTANCE FUNCTIONS */
+
+	/**
+	 * Do not use the Talon on-board pid but do reset. We need to merge sensor on
+	 * the Rio.
+	 * 
+	 * @param inches
+	 *            the number of inches to move forward (negative for backward).
+	 * 
+	 * @return the number of encoder clicks to move. Feed this back to
+	 *         {@link #isPositionOnTarget(double)}.
+	 */
+	public int startMoveInches(double inches) {
+		enableMoveInches();
+		return (int) ((inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
+				* this.props.encoderClicksPerRev);
+	}
+
+	/**
+	 * Sets up all the Talons for moving inches.
+	 */
+	private void enableMoveInches() {
+		enableMoveInches(this.frontLeftMotor);
+		enableMoveInches(this.frontRightMotor);
+		enableMoveInches(this.backLeftMotor);
+		enableMoveInches(this.backRightMotor);
+	}
+
+	/**
+	 * For now just set counts to 0.
+	 * 
+	 * @param motor
+	 *            the Talon being set.
+	 */
+	private void enableMoveInches(WPI_TalonSRX motor) {
+		motor.getSensorCollection().setQuadraturePosition(0, 0);
+	}
+
+	/**
+	 * Returns true if we have gone the number of clicks.
+	 * 
+	 * TODO for now this is true is more than one encoder says it is. We may need to
+	 * adjust.
+	 * 
+	 * @param targetClicks
+	 *            the calculated clicks from {@link #startMoveInches(double)}.
+	 * 
+	 * @return true if the robot has moved the number of clicks and false otherwise.
+	 */
+	public boolean isPositionOnTarget(int targetClicks) {
+		int onTarget = Math.abs(this.frontLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
+				: 0;
+		onTarget += Math.abs(this.frontRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
+				: 0;
+		onTarget += Math.abs(this.backLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
+		onTarget += Math.abs(this.backRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
+		return onTarget > 1;
+	}
+
+	/**
+	 * Stops the inches movement.
+	 */
+	public void stopMoveInches() {
+		this.stop();
+	}
+
+	/* END DRIVE FIXED DISTANCE FUNCTIONS */
+
 	/**
 	 * An instance of this class is used by the {@link DriveSubsystem} to manage the
 	 * drive properties using the {@link ConfigurationSubsystem}.
@@ -306,6 +390,30 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		private double rotatePIDd = ROTATE_PID_D_DEFAULT;
 
 		/**
+		 * This is the effective circumference of the wheels. It is used as part of the
+		 * encoder based position control. The value must be parseable into a double via
+		 * {@link Double#parseDouble(String)} or the default value will be used.
+		 */
+		public static final String EFFECTIVE_WHEEL_CIRCUMFERENCE_KEY = "drive.effective.wheel.circumference";
+		public static final double EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT = 18.85;
+		private double effectiveWheelCircumference = EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT;
+
+		/**
+		 * This is the effective number of encoder revolutions per wheel revolution. It
+		 * is based on gear ratios between the wheels and the encode. It is used as part
+		 * of the encoder based position control. The value must be parseable into a
+		 * double via {@link Double#parseDouble(String)} or the default value will be
+		 * used.
+		 */
+		public static final String EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_KEY = "drive.effective.encoder.rev.per.wheel.rev";
+		public static final double EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT = 1.0;
+		private double effectiveEncoderRevPerWheelRev = EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT;
+
+		public static final String ENCODER_CLICKS_PER_REV_KEY = "drive.encoder.clicks.per.rev";
+		public static final double ENCODER_CLICKS_PER_REV_DEFAULT = 256.0;
+		private double encoderClicksPerRev = ENCODER_CLICKS_PER_REV_DEFAULT;
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -319,6 +427,13 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 			this.rotatePIDp = ConfigurationUtilities.getProperty(config, ROTATE_PID_P_KEY, ROTATE_PID_P_DEFAULT);
 			this.rotatePIDi = ConfigurationUtilities.getProperty(config, ROTATE_PID_I_KEY, ROTATE_PID_I_DEFAULT);
 			this.rotatePIDd = ConfigurationUtilities.getProperty(config, ROTATE_PID_D_KEY, ROTATE_PID_D_DEFAULT);
+
+			this.effectiveWheelCircumference = ConfigurationUtilities.getProperty(config,
+					EFFECTIVE_WHEEL_CIRCUMFERENCE_KEY, EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT);
+			this.effectiveEncoderRevPerWheelRev = ConfigurationUtilities.getProperty(config,
+					EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_KEY, EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT);
+			this.encoderClicksPerRev = ConfigurationUtilities.getProperty(config, ENCODER_CLICKS_PER_REV_KEY,
+					ENCODER_CLICKS_PER_REV_DEFAULT);
 		}
 	}
 }
