@@ -42,4 +42,5 @@ public class OperatorDriveCommand extends AbstractDriveCommand {
 	protected double getNextStickManualRotation() {
 		return oi.getRotationX();
 	}
+	
 }

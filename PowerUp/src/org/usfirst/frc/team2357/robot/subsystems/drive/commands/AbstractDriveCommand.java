@@ -100,6 +100,7 @@ public abstract class AbstractDriveCommand extends AbstractStateCommand {
 	protected void execute() {
 		super.execute();
 		this.driveSubsystem.cartesianDrive(getNextY(), getNextX(), getNextStickManualRotation());
+		System.out.println(this.driveSubsystem.getGyroYaw());
 	}
 
 	/**
