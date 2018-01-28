@@ -6,6 +6,7 @@ import org.usfirst.frc.team2357.robot.subsystems.auto.AutonomousSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.DriveMode;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -57,6 +58,11 @@ public class Robot extends IterativeRobot {
 	private DriveSubsystem driveSubsystem;
 
 	/**
+	 * Now servicing 7 floors.
+	 */
+	private ElevatorSubsystem elevatorSubsystem;
+
+	/**
 	 * This object will define the interactions used by the drivers to control the
 	 * robot.
 	 */
@@ -77,6 +83,7 @@ public class Robot extends IterativeRobot {
 		this.logger = Logger.getLogger(this.getClass().getName());
 		this.configurationSubsystem = new ConfigurationSubsystem();
 		this.driveSubsystem = new DriveSubsystem();
+		this.elevatorSubsystem = new ElevatorSubsystem();
 		this.autonomousSubsystem = new AutonomousSubsystem();
 		this.oi = new OI();
 	}
@@ -175,6 +182,23 @@ public class Robot extends IterativeRobot {
 					"Robot.getDriveSubsystem() was called before Robot.robotInit() was called.");
 		}
 		return this.driveSubsystem;
+	}
+
+	/**
+	 * Returns the one and only {@link ElevatorSubsystem} instance for this
+	 * {@link Robot}.
+	 * 
+	 * @return the {@link ElevatorSubsystem} instance.
+	 * 
+	 * @throws IllegalStateException
+	 *             if this method is called before {@link #robotInit()} is called.
+	 */
+	public ElevatorSubsystem getElevatorSubsystem() {
+		if (this.elevatorSubsystem == null) {
+			throw new IllegalStateException(
+					"Robot.getElevatorSubsystem() was called before Robot.robotInit() was called.");
+		}
+		return this.elevatorSubsystem;
 	}
 
 	/**
