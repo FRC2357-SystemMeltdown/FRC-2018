@@ -239,6 +239,10 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	public double getGyroYaw() {
 		return this.gyro.getYaw();
 	}
+	
+	public AHRS getGyro(){
+		return gyro;
+	}
 
 	/**
 	 * @return the configured initial drive mode for tele-op.

@@ -1,5 +1,8 @@
 package org.usfirst.frc.team2357.robot;
 
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ZeroGyroCommand;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Button;
@@ -25,6 +28,8 @@ public class OI {
 	private static final double STICK_ROTATION_MIN_DEFLECTION = 0.1;
 
 	public OI() {
+		startButton.whenPressed(new ChangeDriveModeCommand());
+		backButton.whenPressed(new ZeroGyroCommand());
 	}
 
 	/**

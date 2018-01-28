@@ -7,6 +7,7 @@ import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubs
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.DriveMode;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
+import org.usfirst.frc.team2357.robot.subsystems.intake.IntakeSub;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -72,6 +73,11 @@ public class Robot extends IterativeRobot {
 	 * The logger used for all logging in our little robot program.
 	 */
 	private Logger logger;
+	
+	/**
+	 * The intake does the intake thingy.
+	 */
+	private IntakeSub intakeSubsystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -84,6 +90,7 @@ public class Robot extends IterativeRobot {
 		this.configurationSubsystem = new ConfigurationSubsystem();
 		this.driveSubsystem = new DriveSubsystem();
 		this.elevatorSubsystem = new ElevatorSubsystem();
+		this.intakeSubsystem = new IntakeSub();
 		this.autonomousSubsystem = new AutonomousSubsystem();
 		this.oi = new OI();
 	}
@@ -182,6 +189,14 @@ public class Robot extends IterativeRobot {
 					"Robot.getDriveSubsystem() was called before Robot.robotInit() was called.");
 		}
 		return this.driveSubsystem;
+	}
+
+	public IntakeSub getIntakeSubsystem() {
+		if(this.intakeSubsystem == null) {
+			throw new IllegalStateException(
+					"Robot.getIntakeSubsystem was called before Robot.robotInit() was called");
+		}
+		return intakeSubsystem;
 	}
 
 	/**
