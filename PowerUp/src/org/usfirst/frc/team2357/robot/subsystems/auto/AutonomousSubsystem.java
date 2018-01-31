@@ -2,9 +2,8 @@ package org.usfirst.frc.team2357.robot.subsystems.auto;
 
 import org.usfirst.frc.team2357.robot.Robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This subsystem is used to select an {@link AutonomousMode} and a sprint
@@ -13,17 +12,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class AutonomousSubsystem extends Subsystem {
 	private final AutonomousChooser autonomousChooser = new AutonomousModeDashboardChooser();
-	private final SendableChooser<Boolean> autoSprint = new SendableChooser<>();
 	private AutonomousMode startedMode;
+	private PlatformSide switchSide = PlatformSide.UNKNOWN;
+	private PlatformSide scaleSide = PlatformSide.UNKNOWN;
 
 	/**
 	 * Initializes the subsystem.
 	 */
 	public AutonomousSubsystem() {
 		super();
-		this.autoSprint.addDefault("No sprint", Boolean.FALSE);
-		this.autoSprint.addObject("Sprint", Boolean.TRUE);
-		SmartDashboard.putData("Sprint", this.autoSprint);
 	}
 
 	/**
@@ -33,8 +30,21 @@ public class AutonomousSubsystem extends Subsystem {
 		// For safety during testing.
 		stop();
 
+		processGameData();
+
 		this.startedMode = this.autonomousChooser.getAutonomousMode();
 		this.startedMode.getAutonomousCommand().start();
+	}
+
+	/**
+	 * Reads the game specific data and processes it into the platform sides.
+	 */
+	private void processGameData() {
+		String gameData = DriverStation.getInstance().getGameSpecificMessage();
+		if ((gameData != null) && (gameData.length() > 1)) {
+			this.switchSide = gameData.charAt(0) == 'R' ? PlatformSide.RIGHT : PlatformSide.LEFT;
+			this.scaleSide = gameData.charAt(1) == 'R' ? PlatformSide.RIGHT : PlatformSide.LEFT;
+		}
 	}
 
 	/**
@@ -52,8 +62,7 @@ public class AutonomousSubsystem extends Subsystem {
 	}
 
 	/**
-	 * Stops any started {@link AutonomousMode} and sets the started mode to
-	 * null.
+	 * Stops any started {@link AutonomousMode} and sets the started mode to null.
 	 */
 	public void stop() {
 		if (this.startedMode != null) {
@@ -63,18 +72,24 @@ public class AutonomousSubsystem extends Subsystem {
 	}
 
 	/**
-	 * Returns true if the chosen autonomous mode is free to sprint toward the
-	 * feeder station. Note that the default value is false.
-	 * 
-	 * @return true if free to sprint and false otherwise.
-	 */
-	public boolean isAutoSprint() {
-		return this.autoSprint.getSelected();
-	}
-
-	/**
 	 * There is no default command for this subsystem.
 	 */
 	public void initDefaultCommand() {
+	}
+
+	/**
+	 * @return the {@link PlatformSide} for our switch platform from the point of
+	 *         view of the drive team.
+	 */
+	public PlatformSide getSwitchSide() {
+		return this.switchSide;
+	}
+
+	/**
+	 * @return the {@link PlatformSide} for our scale platform from the point of
+	 *         view of the drive team.
+	 */
+	public PlatformSide getScaleSide() {
+		return this.scaleSide;
 	}
 }
