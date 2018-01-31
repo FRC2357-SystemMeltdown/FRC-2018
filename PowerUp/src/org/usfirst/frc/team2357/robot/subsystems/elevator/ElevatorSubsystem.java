@@ -127,6 +127,22 @@ public class ElevatorSubsystem extends Subsystem {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Check with the talon to see if either limit switch has been hit. If so, reset
+	 * to match.
+	 * </p>
+	 */
+	@Override
+	public void periodic() {
+		super.periodic();
+		// TODO read limit states
+		// if floor set target and pos to 0 on talon and our last sent to 0
+		// similarly for the top with the top click value.
+	}
+
+	/**
 	 * Used to enter or exit manual mode.
 	 * 
 	 * @param manual
