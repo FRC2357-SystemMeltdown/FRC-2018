@@ -12,10 +12,10 @@ public class RobotMap {
 	public static final int ROTATE_STICK = 1;
 
 	// Drive talon CAN bus ports.
-	public static final int FRONT_LEFT_MOTOR = 4;
-	public static final int FRONT_RIGHT_MOTOR = 3;
-	public static final int BACK_LEFT_MOTOR = 1;
-	public static final int BACK_RIGHT_MOTOR = 2;
+	public static final int FRONT_LEFT_MOTOR = 1;
+	public static final int FRONT_RIGHT_MOTOR = 4;
+	public static final int BACK_LEFT_MOTOR = 2;
+	public static final int BACK_RIGHT_MOTOR = 3;
 
 	// Elevator talon CAN bus port and limit switch DIOs.
 	public static final int ELEVATOR_MOTOR = 5;

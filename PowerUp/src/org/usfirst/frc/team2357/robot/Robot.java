@@ -10,8 +10,10 @@ import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.intake.IntakeSub;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -78,6 +80,8 @@ public class Robot extends IterativeRobot {
 	 * The intake does the intake thingy.
 	 */
 	private IntakeSub intakeSubsystem;
+	
+	private SmartDashboard dash;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -93,6 +97,8 @@ public class Robot extends IterativeRobot {
 		this.intakeSubsystem = new IntakeSub();
 		this.autonomousSubsystem = new AutonomousSubsystem();
 		this.oi = new OI();
+		this.dash = new SmartDashboard();
+		this.oi.initCommands();
 	}
 
 	/**
@@ -291,6 +297,25 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		SmartDashboard.putNumber("Gyro Yaw", driveSubsystem.getGyroYaw());
+		switch (driveSubsystem.getDriveMode()) {
+		case FIELD_RELATIVE:
+			SmartDashboard.putString("Drive Mode", "Field Relative");
+			break;
+		case ROBOT_RELATIVE:
+			SmartDashboard.putString("Drive Mode", "Robot Relative");
+			break;
+		case ROBOT_RELATIVE_90:
+			SmartDashboard.putString("Drive Mode", "Robot Relative 90");
+			break;
+		case ROBOT_RELATIVE_180:
+			SmartDashboard.putString("Drive Mode", "Robot Relative 180");
+			break;
+		case ROBOT_RELATIVE_270:
+			SmartDashboard.putString("Drive Mode", "Robot Relative 270");
+			break;
+		}
+		SmartDashboard.putNumber("Front Left Encoder Out", driveSubsystem.getFrontLeftMotor().getSelectedSensorVelocity(0));
 	}
 
 	/**

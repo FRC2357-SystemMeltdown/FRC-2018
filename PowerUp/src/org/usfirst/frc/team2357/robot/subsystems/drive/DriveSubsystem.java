@@ -1,5 +1,7 @@
 package org.usfirst.frc.team2357.robot.subsystems.drive;
 
+import java.util.LinkedList;
+
 import org.usfirst.frc.team2357.robot.Robot;
 import org.usfirst.frc.team2357.robot.RobotMap;
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationPropertiesConsumer;
@@ -34,6 +36,24 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		 * components derived from the position of the movement stick.
 		 */
 		ROBOT_RELATIVE,
+		
+		/**
+		 * Cartesian movement is relative to the right side of the robot with the X and Y
+		 * components derived from the position of the movement stick.
+		 */
+		ROBOT_RELATIVE_90,
+		
+		/**
+		 * Cartesian movement is relative to the back side of the robot with the X and Y
+		 * components derived from the position of the movement stick.
+		 */
+		ROBOT_RELATIVE_180,
+		
+		/**
+		 * Cartesian movement is relative to the left side of the robot with the X and Y
+		 * components derived from the position of the movement stick.
+		 */
+		ROBOT_RELATIVE_270,
 
 		/**
 		 * Cartesian movement is relative to the field with the X and Y components
@@ -86,6 +106,7 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	private final WPI_TalonSRX frontRightMotor = new WPI_TalonSRX(RobotMap.FRONT_RIGHT_MOTOR);
 	private final WPI_TalonSRX backLeftMotor = new WPI_TalonSRX(RobotMap.BACK_LEFT_MOTOR);
 	private final WPI_TalonSRX backRightMotor = new WPI_TalonSRX(RobotMap.BACK_RIGHT_MOTOR);
+	private final LinkedList<WPI_TalonSRX> motors = new LinkedList<WPI_TalonSRX>();
 	private final MecanumDrive mecanumDrive = new MecanumDrive(frontLeftMotor, backLeftMotor, frontRightMotor,
 			backRightMotor);
 
@@ -115,6 +136,10 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	public DriveSubsystem() {
 		super();
 		Robot.getInstance().getConfigurationSubsystem().addConsumer(this.props);
+		this.motors.add(frontLeftMotor);
+		this.motors.add(frontRightMotor);
+		this.motors.add(backLeftMotor);
+		this.motors.add(backRightMotor);
 
 		rotationController = new PIDController(props.rotatePIDp, props.rotatePIDi, props.rotatePIDd, 0.0, this.gyro,
 				this, 0.01);
@@ -127,6 +152,16 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		configMotor(frontRightMotor);
 		configMotor(backLeftMotor);
 		configMotor(backRightMotor);
+		
+		frontLeftMotor.setInverted(false);
+		frontRightMotor.setInverted(false);
+		backLeftMotor.setInverted(false);
+		backRightMotor.setInverted(false);
+		
+		frontLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		frontRightMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		backLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+		backRightMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 	}
 
 	/**
@@ -229,8 +264,37 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		} else if (this.fixedIntakeDirection != null) {
 			rotation = this.lastPIDOutput;
 		}
-		this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation,
-				this.driveMode == DriveMode.FIELD_RELATIVE ? this.getGyroYaw() : 0.0);
+		switch (this.driveMode) {
+		case FIELD_RELATIVE:
+			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, -this.getGyroYaw());
+			break;
+		case ROBOT_RELATIVE:
+			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 0.0);
+			break;
+		case ROBOT_RELATIVE_90:
+			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 90.0);
+			break;
+		case ROBOT_RELATIVE_180:
+			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 180.0);
+			break;
+		case ROBOT_RELATIVE_270:
+			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, -90.0);
+			break;
+		}
+		for(int i = 0; i < motors.size(); i++){
+			WPI_TalonSRX tempMotor = motors.get(i);
+			if(Math.abs(tempMotor.get()+(tempMotor.get()-(tempMotor.getSelectedSensorVelocity(0)/1000))) < 1){
+				tempMotor.set(tempMotor.get()+(tempMotor.get()-(tempMotor.getSelectedSensorVelocity(0)/1000)));
+			}else if(tempMotor.get() > 0){
+				tempMotor.set(1.0);
+			}else if(tempMotor.get() < 0){
+				tempMotor.set(-1.0);
+			}
+			
+		}
+		
+		//this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation,
+				//this.driveMode == DriveMode.FIELD_RELATIVE ? -this.getGyroYaw() : 0.0);
 	}
 
 	/**
@@ -249,6 +313,22 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 */
 	public DriveMode getInitialTeleDriveMode() {
 		return props.initialTeleDriveMode;
+	}
+
+	public WPI_TalonSRX getFrontLeftMotor() {
+		return frontLeftMotor;
+	}
+
+	public WPI_TalonSRX getFrontRightMotor() {
+		return frontRightMotor;
+	}
+
+	public WPI_TalonSRX getBackLeftMotor() {
+		return backLeftMotor;
+	}
+
+	public WPI_TalonSRX getBackRightMotor() {
+		return backRightMotor;
 	}
 
 	/**

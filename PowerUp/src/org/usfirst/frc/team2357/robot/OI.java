@@ -1,7 +1,15 @@
 package org.usfirst.frc.team2357.robot;
 
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeBackCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeFieldCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeForwardCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeLeftCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeRightCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ZeroGyroCommand;
+import org.usfirst.frc.team2357.robot.triggers.DPadDownTrigger;
+import org.usfirst.frc.team2357.robot.triggers.DPadLeftTrigger;
+import org.usfirst.frc.team2357.robot.triggers.DPadRightTrigger;
+import org.usfirst.frc.team2357.robot.triggers.DPadUpTrigger;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
@@ -13,23 +21,49 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-	private XboxController driveController = new XboxController(0);
-	private Button a = new JoystickButton(driveController, 1);
-	private Button b = new JoystickButton(driveController, 2);
-	private Button x = new JoystickButton(driveController, 3);
-	private Button y = new JoystickButton(driveController, 4);
-	private Button leftBumper = new JoystickButton(driveController, 5);
-	private Button rightBumper = new JoystickButton(driveController, 6);
-	private Button backButton = new JoystickButton(driveController, 7);
-	private Button startButton = new JoystickButton(driveController, 8);
-	private Button leftStickButton = new JoystickButton(driveController, 9);
-	private Button rightStickButton = new JoystickButton(driveController, 10);
+	private XboxController driveController;
+	private Button a;
+	private Button b;
+	private Button x;
+	private Button y;
+	private Button leftBumper;
+	private Button rightBumper;
+	private Button backButton;
+	private Button startButton;
+	private Button leftStickButton;
+	private Button rightStickButton;
+	private DPadUpTrigger up;
+	private DPadRightTrigger right;
+	private DPadDownTrigger down;
+	private DPadLeftTrigger left;
 
 	private static final double STICK_ROTATION_MIN_DEFLECTION = 0.1;
 
 	public OI() {
-		startButton.whenPressed(new ChangeDriveModeCommand());
+		driveController = new XboxController(0);
+		a = new JoystickButton(getDriveController(), 1);
+		b = new JoystickButton(getDriveController(), 2);
+		x = new JoystickButton(getDriveController(), 3);
+		y = new JoystickButton(getDriveController(), 4);
+		leftBumper = new JoystickButton(getDriveController(), 5);
+		rightBumper = new JoystickButton(getDriveController(), 6);
+		backButton = new JoystickButton(getDriveController(), 7);
+		startButton = new JoystickButton(getDriveController(), 8);
+		leftStickButton = new JoystickButton(getDriveController(), 9);
+		rightStickButton = new JoystickButton(getDriveController(), 10);
+		up = new DPadUpTrigger();
+		right = new DPadRightTrigger();
+		down = new DPadDownTrigger();
+		left = new DPadLeftTrigger();
+	}
+	
+	public void initCommands(){
+		startButton.whenPressed(new ChangeDriveModeFieldCommand());
 		backButton.whenPressed(new ZeroGyroCommand());
+		up.whenActive(new ChangeDriveModeForwardCommand());
+		right.whenActive(new ChangeDriveModeRightCommand());
+		down.whenActive(new ChangeDriveModeBackCommand());
+		left.whenActive(new ChangeDriveModeLeftCommand());
 	}
 
 	/**
@@ -37,7 +71,11 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no Y movement.
 	 */
 	public double getYMoveValue() {
-		return driveController.getY(Hand.kLeft);
+		double speed = -getDriveController().getY(Hand.kLeft);
+		if (Math.abs(speed) < STICK_ROTATION_MIN_DEFLECTION) {
+			speed = 0.0;
+		}
+		return speed;
 	}
 
 	/**
@@ -45,7 +83,11 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no X movement.
 	 */
 	public double getXMoveValue() {
-		return driveController.getX(Hand.kLeft);
+		double speed = -getDriveController().getX(Hand.kLeft);
+		if (Math.abs(speed) < STICK_ROTATION_MIN_DEFLECTION) {
+			speed = 0.0;
+		}
+		return speed;
 	}
 
 	/**
@@ -53,11 +95,15 @@ public class OI {
 	 *         0.0 is no rotation.
 	 */
 	public double getRotationX() {
-		double rotation = driveController.getX(Hand.kRight);
+		double rotation = getDriveController().getX(Hand.kRight);
 		if (Math.abs(rotation) < STICK_ROTATION_MIN_DEFLECTION) {
 			rotation = 0.0;
 		}
 		return rotation;
+	}
+
+	public XboxController getDriveController() {
+		return driveController;
 	}
 
 	/**

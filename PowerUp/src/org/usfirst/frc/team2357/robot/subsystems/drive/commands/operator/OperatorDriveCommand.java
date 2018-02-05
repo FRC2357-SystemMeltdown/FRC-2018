@@ -23,7 +23,7 @@ public class OperatorDriveCommand extends AbstractOperatorDriveCommand {
 	 * {@inheritDoc}
 	 * 
 	 * <p>
-	 * This implementation returns the X value from {@link OI}.
+	 * This implementation returns the X value  from {@link OI}.
 	 * </p>
 	 */
 	@Override
