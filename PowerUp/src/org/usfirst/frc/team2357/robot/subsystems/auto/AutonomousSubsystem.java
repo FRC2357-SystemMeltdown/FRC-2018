@@ -4,6 +4,8 @@ import org.usfirst.frc.team2357.robot.Robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This subsystem is used to select an {@link AutonomousMode} and a sprint
@@ -15,12 +17,24 @@ public class AutonomousSubsystem extends Subsystem {
 	private AutonomousMode startedMode;
 	private PlatformSide switchSide = PlatformSide.UNKNOWN;
 	private PlatformSide scaleSide = PlatformSide.UNKNOWN;
+	SendableChooser<TargetPreference> targetPrefernceChooser;
+	private TargetPreference targetPreference = null;
 
 	/**
 	 * Initializes the subsystem.
 	 */
 	public AutonomousSubsystem() {
 		super();
+		this.targetPrefernceChooser = new SendableChooser<>();
+		TargetPreference[] positions = TargetPreference.values();
+		for (TargetPreference position : positions) {
+			if (position == TargetPreference.PREFER_SWITCH) {
+				this.targetPrefernceChooser.addDefault(position.name(), position);
+			} else {
+				this.targetPrefernceChooser.addObject(position.name(), position);
+			}
+		}
+		SmartDashboard.putData("Target Preference", this.targetPrefernceChooser);
 	}
 
 	/**
@@ -30,6 +44,7 @@ public class AutonomousSubsystem extends Subsystem {
 		// For safety during testing.
 		stop();
 
+		this.targetPreference = this.targetPrefernceChooser.getSelected();
 		processGameData();
 
 		this.startedMode = this.autonomousChooser.getAutonomousMode();
@@ -91,5 +106,12 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public PlatformSide getScaleSide() {
 		return this.scaleSide;
+	}
+
+	/**
+	 * @return the {@link TargetPreference} for the robot this match.
+	 */
+	public TargetPreference getTargetPreference() {
+		return this.targetPreference;
 	}
 }

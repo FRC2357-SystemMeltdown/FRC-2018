@@ -3,6 +3,7 @@ package org.usfirst.frc.team2357.robot.subsystems.auto;
 import java.util.function.Supplier;
 
 import org.usfirst.frc.team2357.robot.subsystems.auto.commands.DriveAutoLine;
+import org.usfirst.frc.team2357.robot.subsystems.auto.commands.StartFarLeft;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -12,7 +13,11 @@ import edu.wpi.first.wpilibj.command.Command;
  * done so that only the one command that will be run needs to be constructed.
  */
 enum AutonomousMode {
-	DriveAutoline(() -> new DriveAutoLine());
+	/** Start anywhere and drive. */
+	DriveAutoline(() -> new DriveAutoLine()),
+
+	/** Start all the way to the left with intake facing right. */
+	StartFarLeft(() -> new StartFarLeft());
 
 	private final Supplier<Command> autoCommandSupplier;
 	private Command autoCommand;
