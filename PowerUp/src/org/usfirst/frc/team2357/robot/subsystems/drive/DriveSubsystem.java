@@ -245,10 +245,9 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 * </p>
 	 *
 	 * @param ySpeed
-	 *            The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+	 *            The robot's speed along the Y axis [-1.0..1.0].
 	 * @param xSpeed
-	 *            The robot's speed along the X axis [-1.0..1.0]. Forward is
-	 *            positive.
+	 *            The robot's speed along the X axis [-1.0..1.0].
 	 * @param manualStickRotation
 	 *            If non-zero, manual rotation mode will be entered and the fixed
 	 *            rotation control turned off.
@@ -378,10 +377,9 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	}
 
 	/**
-	 * Returns true if we have gone the number of clicks.
-	 * 
-	 * TODO for now this is true is more than one encoder says it is. We may need to
-	 * adjust.
+	 * Returns true if we have gone the number of clicks. This is the same as
+	 * checking that the result of {@link #getTargetObtainedPercentage(int)} is
+	 * greater than or equal to 1.0.
 	 * 
 	 * @param targetClicks
 	 *            the calculated clicks from {@link #startMoveInches(double)}.
@@ -389,13 +387,38 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 * @return true if the robot has moved the number of clicks and false otherwise.
 	 */
 	public boolean isPositionOnTarget(int targetClicks) {
-		int onTarget = Math.abs(this.frontLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
-				: 0;
-		onTarget += Math.abs(this.frontRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1
-				: 0;
-		onTarget += Math.abs(this.backLeftMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
-		onTarget += Math.abs(this.backRightMotor.getSensorCollection().getQuadraturePosition()) >= targetClicks ? 1 : 0;
-		return onTarget > 1;
+		return getTargetObtainedPercentage(targetClicks) >= 1.0;
+	}
+
+	/**
+	 * Returns a positive value indicating the percentage (1.0 is 100%) of the
+	 * target clicks obtained. Only encoders that are within 80% of the maximum
+	 * encoder click value are considered.
+	 * 
+	 * @param targetClicks
+	 *            the target click value.
+	 * @return the percentage of click obtainment.
+	 */
+	public double getTargetObtainedPercentage(int targetClicks) {
+		int[] clicks = new int[4];
+		int max = 0;
+		clicks[0] = this.frontLeftMotor.getSensorCollection().getQuadraturePosition();
+		max = clicks[0];
+		clicks[1] = this.frontRightMotor.getSensorCollection().getQuadraturePosition();
+		max = Math.max(max, clicks[1]);
+		clicks[2] = this.backLeftMotor.getSensorCollection().getQuadraturePosition();
+		max = Math.max(max, clicks[2]);
+		clicks[3] = this.backRightMotor.getSensorCollection().getQuadraturePosition();
+		max = Math.max(max, clicks[3]);
+		int total = 0;
+		int encodersInTotal = 0;
+		for (int i = 0; i < clicks.length; i++) {
+			if ((((double)clicks[i]) / ((double)max)) > 0.8) {
+				total += clicks[i];
+				encodersInTotal++;
+			}
+		}
+		return (double)total / (double)encodersInTotal / (double)targetClicks;
 	}
 
 	/**

@@ -10,7 +10,6 @@ import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.intake.IntakeSub;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
