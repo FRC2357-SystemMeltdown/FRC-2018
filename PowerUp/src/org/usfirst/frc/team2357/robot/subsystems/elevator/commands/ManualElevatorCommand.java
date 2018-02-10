@@ -33,15 +33,12 @@ public class ManualElevatorCommand extends AbstractStateCommand {
 	protected void initialize() {
 		super.initialize();
 		this.oi = Robot.getInstance().getOI();
-		if (!this.elevatorSubsystem.isManualOverride()) {
-			this.elevatorSubsystem.setManualMode(true);
-		}
 	}
 
 	@Override
 	protected void execute() {
 		super.execute();
-		// TODO read from oi and send to elevator.
+		this.elevatorSubsystem.manualMovement(this.oi.getManualElevatorSpeed());
 	}
 
 	@Override

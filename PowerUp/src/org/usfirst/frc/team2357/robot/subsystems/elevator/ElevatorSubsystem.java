@@ -105,8 +105,6 @@ public class ElevatorSubsystem extends Subsystem {
 		configMotorForPosition(this.elevatorMotor, this.lastTargetClicksSentToTalon);
 	}
 
-	// TODO add the methods needed for ManualElevatorCommand.
-
 	private void configMotorForPosition(WPI_TalonSRX talon, int atPosition) {
 		talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		talon.configAllowableClosedloopError(0, this.props.positionElevatorPIDokError, 0);
@@ -148,7 +146,7 @@ public class ElevatorSubsystem extends Subsystem {
 	 * @param manual
 	 *            true for manual mode and false for positional pid control.
 	 */
-	public void setManualMode(boolean manual) {
+	private void setManualMode(boolean manual) {
 		if (manual) {
 			configMotorForManual(elevatorMotor);
 		} else {
@@ -195,6 +193,19 @@ public class ElevatorSubsystem extends Subsystem {
 	public void tweakTarget(final int tweak) {
 		this.lastTargetClicksSentToTalon = this.lastTargetClicksSentToTalon + tweak;
 		this.elevatorMotor.set(ControlMode.Position, this.lastTargetClicksSentToTalon);
+	}
+
+	/**
+	 * If in auto, changes to manual control and then sets elevator speed.
+	 * 
+	 * @param speed
+	 *            the speed (-1.0 to 1.0) at which to move.
+	 */
+	public void manualMovement(double speed) {
+		if (!isManualOverride()) {
+			this.setManualMode(true);
+		}
+		elevatorMotor.set(ControlMode.PercentOutput, speed);
 	}
 
 	/**

@@ -35,11 +35,7 @@ public class GotoElevatorPositionCommand extends AbstractStateCommand {
 	@Override
 	protected void initialize() {
 		super.initialize();
-		// If manual mode active, go back to positional pid.
-		if (this.elevatorSubsystem.isManualOverride()) {
-			this.elevatorSubsystem.setManualMode(false);
-		}
-		// Now set the floor as the new target.
+		// Set the floor as the new target. Changes to auto.
 		this.elevatorSubsystem.gotoFloor(this.floor);
 	}
 

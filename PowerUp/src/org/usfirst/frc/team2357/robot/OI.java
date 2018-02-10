@@ -6,6 +6,9 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeD
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeLeftCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeRightCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ZeroGyroCommand;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem.Floors;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.GotoElevatorPositionCommand;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.ManualElevatorCommand;
 import org.usfirst.frc.team2357.robot.triggers.DPadDownTrigger;
 import org.usfirst.frc.team2357.robot.triggers.DPadLeftTrigger;
 import org.usfirst.frc.team2357.robot.triggers.DPadRightTrigger;
@@ -36,8 +39,17 @@ public class OI {
 	private DPadRightTrigger right;
 	private DPadDownTrigger down;
 	private DPadLeftTrigger left;
+	
+	private XboxController coController;
+	private Button floor;
+	private Button carry;
+	private Button scoreSwitch;
+	private Button scoreScale;
+	private Button climb;
+	private Button toggleManualElevator;
 
 	private static final double STICK_ROTATION_MIN_DEFLECTION = 0.1;
+	private static final double STICK_ELEVATOR_MIN_DEFLECTION = 0.1;
 
 	public OI() {
 		driveController = new XboxController(0);
@@ -55,6 +67,14 @@ public class OI {
 		right = new DPadRightTrigger();
 		down = new DPadDownTrigger();
 		left = new DPadLeftTrigger();
+
+		coController = new XboxController(1);
+		floor = new JoystickButton(getCoController(), 1); // A
+		carry = new JoystickButton(getCoController(), 3); // X
+		scoreSwitch = new JoystickButton(getCoController(), 2); // B
+		scoreScale = new JoystickButton(getCoController(), 4); // Y
+		climb = new JoystickButton(getCoController(), 6); // Right bumper
+		toggleManualElevator = new JoystickButton(getCoController(), 5); // Left bumper
 	}
 	
 	public void initCommands(){
@@ -64,6 +84,13 @@ public class OI {
 		right.whenActive(new ChangeDriveModeRightCommand());
 		down.whenActive(new ChangeDriveModeBackCommand());
 		left.whenActive(new ChangeDriveModeLeftCommand());
+
+		floor.whenPressed(new GotoElevatorPositionCommand(Floors.FLOOR));
+		carry.whenPressed(new GotoElevatorPositionCommand(Floors.CARRY));
+		scoreSwitch.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
+		scoreScale.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
+		climb.whenPressed(new GotoElevatorPositionCommand(Floors.CLIMB_INITIATION));
+		toggleManualElevator.toggleWhenPressed(new ManualElevatorCommand());
 	}
 
 	/**
@@ -106,10 +133,18 @@ public class OI {
 		return driveController;
 	}
 
+	public XboxController getCoController() {
+		return coController;
+	}
+
 	/**
-	 * @return the field relative rotation target angle based on user input. The
-	 *         value is between -pi and pi radians where 0.0 is to right in on the X
-	 *         axis. This value will likely need to be rotated depending on the
-	 *         physical orientation of the gyro on the robot.
+	 * @return the manual elevator speed. The value is between -1.0 and 1.0.
 	 */
+	public double getManualElevatorSpeed() {
+		double speed = getCoController().getY(Hand.kLeft);
+		if (Math.abs(speed) < STICK_ELEVATOR_MIN_DEFLECTION) {
+			speed = 0.0;
+		}
+		return speed;
+	}
 }
