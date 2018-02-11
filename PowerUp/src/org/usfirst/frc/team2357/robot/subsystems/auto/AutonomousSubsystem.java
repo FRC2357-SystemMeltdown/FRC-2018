@@ -17,8 +17,9 @@ public class AutonomousSubsystem extends Subsystem {
 	private AutonomousMode startedMode;
 	private PlatformSide switchSide = PlatformSide.UNKNOWN;
 	private PlatformSide scaleSide = PlatformSide.UNKNOWN;
-	SendableChooser<TargetPreference> targetPrefernceChooser;
+	private SendableChooser<TargetPreference> targetPrefernceChooser;
 	private TargetPreference targetPreference = null;
+	private double autoStartWaitTime = 0.0;
 
 	/**
 	 * Initializes the subsystem.
@@ -44,6 +45,7 @@ public class AutonomousSubsystem extends Subsystem {
 		// For safety during testing.
 		stop();
 
+		this.autoStartWaitTime = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 		this.targetPreference = this.targetPrefernceChooser.getSelected();
 		processGameData();
 
@@ -113,5 +115,12 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public TargetPreference getTargetPreference() {
 		return this.targetPreference;
+	}
+
+	/**
+	 * @return the time to wait in seconds before moving in autonomous.
+	 */
+	public double getAutoStartWaitTime() {
+		return this.autoStartWaitTime;
 	}
 }

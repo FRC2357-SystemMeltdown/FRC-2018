@@ -9,6 +9,8 @@ package org.usfirst.frc.team2357.robot.subsystems.auto;
  * {@link StartPosition#FAR_LEFT} and {@link StartPosition#FAR_RIGHT}. The other
  * start positions should assume {@link TargetPreference#ALWAYS_SWITCH}.
  * </p>
+ * 
+ * TODO consider if these could be used any non-middle.
  */
 public enum TargetPreference {
 	/** Always switch. */
