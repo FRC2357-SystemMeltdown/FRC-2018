@@ -17,9 +17,11 @@ public class AutonomousSubsystem extends Subsystem {
 	private AutonomousMode startedMode;
 	private PlatformSide switchSide = PlatformSide.UNKNOWN;
 	private PlatformSide scaleSide = PlatformSide.UNKNOWN;
-	private SendableChooser<TargetPreference> targetPrefernceChooser;
+	private final SendableChooser<TargetPreference> targetPrefernceChooser;
 	private TargetPreference targetPreference = null;
 	private double autoStartWaitTime = 0.0;
+	private final SendableChooser<CubeTwoOptions> cubeTwoOptionChooser;
+	private CubeTwoOptions cube2Option = CubeTwoOptions.NO_CUBE_TWO;
 
 	/**
 	 * Initializes the subsystem.
@@ -36,6 +38,11 @@ public class AutonomousSubsystem extends Subsystem {
 			}
 		}
 		SmartDashboard.putData("Target Preference", this.targetPrefernceChooser);
+
+		this.cubeTwoOptionChooser = new SendableChooser<>();
+		this.cubeTwoOptionChooser.addDefault("No cube 2", CubeTwoOptions.NO_CUBE_TWO);
+		this.cubeTwoOptionChooser.addObject("Cube 2 on other target", CubeTwoOptions.OTHER);
+		this.cubeTwoOptionChooser.addObject("Cube 2 on same target", CubeTwoOptions.SAME);
 	}
 
 	/**
@@ -47,6 +54,7 @@ public class AutonomousSubsystem extends Subsystem {
 
 		this.autoStartWaitTime = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 		this.targetPreference = this.targetPrefernceChooser.getSelected();
+		this.cube2Option = this.cubeTwoOptionChooser.getSelected();
 		processGameData();
 
 		this.startedMode = this.autonomousChooser.getAutonomousMode();
@@ -122,5 +130,12 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public double getAutoStartWaitTime() {
 		return this.autoStartWaitTime;
+	}
+
+	/**
+	 * @return the driver station choosen option for cube 2.
+	 */
+	public CubeTwoOptions getCubeTwoOption() {
+		return this.cube2Option;
 	}
 }

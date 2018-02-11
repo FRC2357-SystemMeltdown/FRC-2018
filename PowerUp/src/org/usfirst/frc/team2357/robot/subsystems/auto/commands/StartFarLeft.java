@@ -1,8 +1,6 @@
 package org.usfirst.frc.team2357.robot.subsystems.auto.commands;
 
-import org.usfirst.frc.team2357.command.AbstractStateCommandGroup;
-import org.usfirst.frc.team2357.robot.Robot;
-import org.usfirst.frc.team2357.robot.subsystems.auto.AutonomousSubsystem;
+import org.usfirst.frc.team2357.robot.subsystems.auto.Cube1EndingPosition;
 import org.usfirst.frc.team2357.robot.subsystems.auto.PlatformSide;
 import org.usfirst.frc.team2357.robot.subsystems.auto.TargetPreference;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.FixedIntakeDirection;
@@ -14,12 +12,13 @@ import edu.wpi.first.wpilibj.command.WaitCommand;
 /**
  * Command for starting far left.
  */
-public class StartFarLeft extends AbstractStateCommandGroup {
+public class StartFarLeft extends AbstractStagedAutonomous {
 	public StartFarLeft() {
-		AutonomousSubsystem as = Robot.getInstance().getAutonomousSubsystem();
+		super();
 		PlatformSide switchSide = as.getSwitchSide();
 		PlatformSide scaleSide = as.getScaleSide();
 		TargetPreference tp = as.getTargetPreference();
+		Cube1EndingPosition cube1EndingPosition = null;
 
 		if (as.getAutoStartWaitTime() > 0.0) {
 			addSequential(new WaitCommand(as.getAutoStartWaitTime()));
@@ -34,33 +33,35 @@ public class StartFarLeft extends AbstractStateCommandGroup {
 			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 90.0, 0.7, 0.0));
 			// TODO add command to drive intake out.
-			// TODO find a second cube and pick a target.
+			cube1EndingPosition = Cube1EndingPosition.SIDE_OF_LEFT_SWITCH;
 		} else if ((scaleSide == PlatformSide.LEFT) && (tp != TargetPreference.ALWAYS_SWITCH)) {
 			// Got here if there are any conditions that lead to left scale.
 			// TODO check these drive distances.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 280.0, 0.0, 0.7));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 190.0, 0.0, 0.7));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, 0.7, 0.0));
 			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 30.0, 0.7, 0.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 50.0, 0.0, 0.7));
 			// TODO add command to drive intake out.
-			// TODO find a second cube and pick a target.
+			cube1EndingPosition = Cube1EndingPosition.LEFT_SCALE;
 		} else if ((tp == TargetPreference.ALWAYS_SWITCH) || (tp == TargetPreference.PREFER_SWITCH)) {
 			// Got here if there are any conditions that lead to right switch.
 			// TODO check these drive distances.
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 20.0, 0.0, 0.7));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.7, 0.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.7, 0.0));
 			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.0, 0.7));
 			// TODO add command to drive intake out.
-			// TODO find a second cube and pick a target.
+			cube1EndingPosition = Cube1EndingPosition.FRONT_OF_RIGHT_SWITCH;
 		} else {
 			// Got here if there are any conditions that lead to right scale.
 			// TODO check these drive distances.
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.RIGHT, 190.0, 0.0, 0.7));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.7, 0.0));
-			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 200.0, 0.7, 0.0));
+			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 40.0, 0.0, 0.7));
 			// TODO add command to drive intake out.
-			// TODO find a second cube and pick a target.
+			cube1EndingPosition = Cube1EndingPosition.RIGHT_SCALE;
 		}
+		addCube2Commands(cube1EndingPosition);
 	}
 }
