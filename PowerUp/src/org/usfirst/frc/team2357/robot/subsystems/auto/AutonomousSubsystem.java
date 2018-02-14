@@ -20,6 +20,7 @@ public class AutonomousSubsystem extends Subsystem {
 	private final SendableChooser<TargetPreference> targetPrefernceChooser;
 	private TargetPreference targetPreference = null;
 	private double autoStartWaitTime = 0.0;
+	private double autoPostScoreFirstCubeWaitTime = 0.0;
 	private final SendableChooser<CubeTwoOptions> cubeTwoOptionChooser;
 	private CubeTwoOptions cube2Option = CubeTwoOptions.NO_CUBE_TWO;
 
@@ -53,6 +54,7 @@ public class AutonomousSubsystem extends Subsystem {
 		stop();
 
 		this.autoStartWaitTime = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+		this.autoPostScoreFirstCubeWaitTime = SmartDashboard.getNumber("DB/Slider 1", 0.0);
 		this.targetPreference = this.targetPrefernceChooser.getSelected();
 		this.cube2Option = this.cubeTwoOptionChooser.getSelected();
 		processGameData();
@@ -130,6 +132,14 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public double getAutoStartWaitTime() {
 		return this.autoStartWaitTime;
+	}
+
+	/**
+	 * @return the time to wait in seconds after scoring the first cube in
+	 *         autonomous.
+	 */
+	public double getAutoPostScoreFirstCubeWaitTime() {
+		return autoPostScoreFirstCubeWaitTime;
 	}
 
 	/**
