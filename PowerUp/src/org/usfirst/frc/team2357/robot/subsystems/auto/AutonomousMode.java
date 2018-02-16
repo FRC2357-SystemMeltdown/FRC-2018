@@ -36,15 +36,24 @@ enum AutonomousMode {
 	}
 
 	/**
-	 * Returns the autonomous {@link Command} for the reference value of this
-	 * enumeration.
-	 * 
-	 * @return the autonomous {@link Command} for one enumeration value.
+	 * Starts the selected command. The command is only started if this method has
+	 * not been called since startup or stop has been called since the last start.
 	 */
-	public synchronized Command getAutonomousCommand() {
+	public synchronized void start() {
 		if (this.autoCommand == null) {
 			this.autoCommand = this.autoCommandSupplier.get();
+			this.autoCommand.start();
 		}
-		return this.autoCommand;
+	}
+
+	/**
+	 * Starts the selected command. The command is only started if this method has
+	 * not been called since startup or stop has been called since the last start.
+	 */
+	public synchronized void stop() {
+		if (this.autoCommand != null) {
+			this.autoCommand.cancel();
+			this.autoCommand = null;
+		}
 	}
 }

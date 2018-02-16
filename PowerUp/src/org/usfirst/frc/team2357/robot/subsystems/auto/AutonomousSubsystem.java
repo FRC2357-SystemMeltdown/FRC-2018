@@ -60,7 +60,7 @@ public class AutonomousSubsystem extends Subsystem {
 		processGameData();
 
 		this.startedMode = this.autonomousChooser.getAutonomousMode();
-		this.startedMode.getAutonomousCommand().start();
+		this.startedMode.start();
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public void stop() {
 		if (this.startedMode != null) {
-			this.startedMode.getAutonomousCommand().cancel();
+			this.startedMode.stop();
 			this.startedMode = null;
 		}
 	}
