@@ -18,7 +18,8 @@ public class RobotMap {
 	public static final int BACK_RIGHT_MOTOR = 3;
 
 	// Elevator talon CAN bus port and limit switch DIOs.
-	public static final int ELEVATOR_MOTOR = 5;
+	public static final int ELEVATOR_MOTOR_1 = 5;
+	public static final int ELEVATOR_MOTOR_2 = 6;
 	// TODO do we want two limit switches here or direct to the Talon?
 
 }

@@ -81,7 +81,8 @@ public class ElevatorSubsystem extends Subsystem {
 		}
 	}
 
-	private final WPI_TalonSRX elevatorMotor = new WPI_TalonSRX(RobotMap.ELEVATOR_MOTOR);
+	private final WPI_TalonSRX elevatorMotor = new WPI_TalonSRX(RobotMap.ELEVATOR_MOTOR_1);
+	private final WPI_TalonSRX elevatorMotor2 = new WPI_TalonSRX(RobotMap.ELEVATOR_MOTOR_2);
 	// TODO do we want two limit switches here or direct to the Talon?
 
 	private final ElevatorProperties props = new ElevatorProperties();
@@ -102,6 +103,7 @@ public class ElevatorSubsystem extends Subsystem {
 		super();
 		Robot.getInstance().getConfigurationSubsystem().addConsumer(this.props);
 
+		elevatorMotor2.follow(elevatorMotor);
 		configMotorForPosition(this.elevatorMotor, this.lastTargetClicksSentToTalon);
 	}
 

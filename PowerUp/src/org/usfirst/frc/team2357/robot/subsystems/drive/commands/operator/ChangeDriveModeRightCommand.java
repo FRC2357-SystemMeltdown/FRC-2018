@@ -21,7 +21,7 @@ public class ChangeDriveModeRightCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_270);
+    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_90);
     }
 
     // Called repeatedly when this Command is scheduled to run

@@ -1,27 +1,27 @@
-package org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator;
+package org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto;
 
 import org.usfirst.frc.team2357.robot.Robot;
 import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem;
-import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.DriveMode;
+import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.FixedIntakeDirection;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class ChangeDriveModeLeftCommand extends Command {
+public class ChangeDirectionDown extends Command {
 	
-	protected DriveSubsystem driveSub;
+	private DriveSubsystem driveSub = Robot.getInstance().getDriveSubsystem();
 
-    public ChangeDriveModeLeftCommand() {
+    public ChangeDirectionDown() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	requires(driveSub = Robot.getInstance().getDriveSubsystem());
+    	requires(driveSub);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_270);
+    	driveSub.setFixedIntakeDirection(FixedIntakeDirection.DOWN_FIELD);
     }
 
     // Called repeatedly when this Command is scheduled to run
