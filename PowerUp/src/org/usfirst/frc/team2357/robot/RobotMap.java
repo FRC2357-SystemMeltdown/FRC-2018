@@ -13,13 +13,17 @@ public class RobotMap {
 
 	// Drive talon CAN bus ports.
 	public static final int FRONT_LEFT_MOTOR = 1;
-	public static final int FRONT_RIGHT_MOTOR = 4;
+	public static final int FRONT_RIGHT_MOTOR = 3;
 	public static final int BACK_LEFT_MOTOR = 2;
-	public static final int BACK_RIGHT_MOTOR = 3;
+	public static final int BACK_RIGHT_MOTOR = 4;
 
 	// Elevator talon CAN bus port and limit switch DIOs.
-	public static final int ELEVATOR_MOTOR_1 = 5;
-	public static final int ELEVATOR_MOTOR_2 = 6;
+	public static final int ELEVATOR_MOTOR = 5;
 	// TODO do we want two limit switches here or direct to the Talon?
+	
+	public static final int INTAKE_MOTOR_1 = 6;
+	public static final int INTAKE_MOTOR_2 = 7;
+	
+	public static final int CLIMBER_MOTOR = 8;
 
 }
