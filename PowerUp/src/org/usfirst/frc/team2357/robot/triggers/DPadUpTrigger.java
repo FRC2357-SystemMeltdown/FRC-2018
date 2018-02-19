@@ -1,15 +1,19 @@
 package org.usfirst.frc.team2357.robot.triggers;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Trigger;
-
-import org.usfirst.frc.team2357.robot.Robot;
 
 /**
  *
  */
 public class DPadUpTrigger extends Trigger {
+	private final XboxController controller;
 
-    public boolean get() {
-        return 0 == Robot.getInstance().getOI().getDriveController().getPOV(); 
-    }
+	public DPadUpTrigger(XboxController controller) {
+		this.controller = controller;
+	}
+
+	public boolean get() {
+		return 0 == this.controller.getPOV();
+	}
 }

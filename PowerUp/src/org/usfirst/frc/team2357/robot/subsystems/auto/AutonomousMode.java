@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import org.usfirst.frc.team2357.robot.subsystems.auto.commands.DriveAutoLine;
 import org.usfirst.frc.team2357.robot.subsystems.auto.commands.StartFarLeft;
+import org.usfirst.frc.team2357.robot.subsystems.auto.commands.StartRightSwitch;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -16,8 +17,11 @@ enum AutonomousMode {
 	/** Start anywhere and drive. */
 	DriveAutoline(() -> new DriveAutoLine()),
 
-	/** Start all the way to the left with intake facing right. */
-	StartFarLeft(() -> new StartFarLeft());
+	/** Start all the way to the left. */
+	StartFarLeft(() -> new StartFarLeft()),
+
+	/** Start across from the right switch plate. */
+	StartRightSwitch(() -> new StartRightSwitch());
 
 	private final Supplier<Command> autoCommandSupplier;
 	private Command autoCommand;

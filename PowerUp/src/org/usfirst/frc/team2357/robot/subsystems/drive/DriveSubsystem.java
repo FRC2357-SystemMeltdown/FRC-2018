@@ -300,7 +300,12 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 * @return the current gyro yaw.
 	 */
 	public double getGyroYaw() {
-		return this.gyro.getYaw();
+		double yaw = this.gyro.getYaw();
+		yaw += 90.0;
+		if (yaw > 180.0) {
+			yaw -= 360.0;
+		}
+		return yaw;
 	}
 	
 	public AHRS getGyro(){

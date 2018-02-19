@@ -65,6 +65,11 @@ public class Robot extends IterativeRobot {
 	private ElevatorSubsystem elevatorSubsystem;
 
 	/**
+	 * All your cubes are belong to us.
+	 */
+	private IntakeSub intakeSubsystem;
+
+	/**
 	 * This object will define the interactions used by the drivers to control the
 	 * robot.
 	 */
@@ -74,13 +79,6 @@ public class Robot extends IterativeRobot {
 	 * The logger used for all logging in our little robot program.
 	 */
 	private Logger logger;
-	
-	/**
-	 * The intake does the intake thingy.
-	 */
-	private IntakeSub intakeSubsystem;
-	
-	private SmartDashboard dash;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -96,7 +94,6 @@ public class Robot extends IterativeRobot {
 		this.intakeSubsystem = new IntakeSub();
 		this.autonomousSubsystem = new AutonomousSubsystem();
 		this.oi = new OI();
-		this.dash = new SmartDashboard();
 		this.oi.initCommands();
 	}
 
