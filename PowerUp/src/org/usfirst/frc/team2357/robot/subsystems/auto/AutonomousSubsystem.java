@@ -59,7 +59,12 @@ public class AutonomousSubsystem extends Subsystem {
 		this.cube2Option = this.cubeTwoOptionChooser.getSelected();
 		processGameData();
 
-		this.startedMode = this.autonomousChooser.getAutonomousMode();
+		if (getSwitchSide() == PlatformSide.UNKNOWN) {
+			// Never got game data just drive.
+			this.startedMode = AutonomousMode.DriveAutoline;
+		} else {
+			this.startedMode = this.autonomousChooser.getAutonomousMode();
+		}
 		this.startedMode.start();
 	}
 
@@ -67,7 +72,19 @@ public class AutonomousSubsystem extends Subsystem {
 	 * Reads the game specific data and processes it into the platform sides.
 	 */
 	private void processGameData() {
+		int retries = 100;
 		String gameData = DriverStation.getInstance().getGameSpecificMessage();
+		// Should never loop in our code but reports from week 0 events
+		// indicate that the data may be slightly delayed.
+		while (((gameData == null) || (gameData.length() < 2)) && retries > 0) {
+			retries--;
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException ie) {
+				// Just ignore the interrupted exception
+			}
+			gameData = DriverStation.getInstance().getGameSpecificMessage();
+		}
 		if ((gameData != null) && (gameData.length() > 1)) {
 			this.switchSide = gameData.charAt(0) == 'R' ? PlatformSide.RIGHT : PlatformSide.LEFT;
 			this.scaleSide = gameData.charAt(1) == 'R' ? PlatformSide.RIGHT : PlatformSide.LEFT;

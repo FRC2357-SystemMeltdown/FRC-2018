@@ -114,8 +114,8 @@ public class OI {
 		scoreScale.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
 		climb.whenPressed(new GotoElevatorPositionCommand(Floors.CLIMB_INITIATION));
 		manualElevator.whileHeld(new ManualElevatorCommand());
-		intakeIn.whileActive(new IntakeInCommand());
-		intakeOut.whileActive(new IntakeOutCommand());
+		intakeIn.whileActive(new IntakeInCommand(0.6));
+		intakeOut.whileActive(new IntakeOutCommand(0.6));
 
 		resetGyro.whenActive(new ZeroGyroCommand());
 	}
@@ -168,7 +168,7 @@ public class OI {
 	 * @return the manual elevator speed. The value is between -1.0 and 1.0.
 	 */
 	public double getManualElevatorSpeed() {
-		double speed = getCoController().getY(Hand.kLeft);
+		double speed = getCoController().getY(Hand.kRight);
 		if (Math.abs(speed) < STICK_ELEVATOR_MIN_DEFLECTION) {
 			speed = 0.0;
 		}

@@ -10,16 +10,18 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
  */
 public class TimedIntakeOutCommand extends TimedCommand {
 
-	protected IntakeSub intakeSub;
+	private final IntakeSub intakeSub;
+	private final double speed;
 
-	public TimedIntakeOutCommand(double timeoutSeconds) {
+	public TimedIntakeOutCommand(double timeoutSeconds, double speed) {
 		super(timeoutSeconds);
 		requires(intakeSub = Robot.getInstance().getIntakeSubsystem());
+		this.speed = speed;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		intakeSub.intakeOut();
+		intakeSub.intakeOut(this.speed);
 	}
 
 	// Called once after isFinished returns true

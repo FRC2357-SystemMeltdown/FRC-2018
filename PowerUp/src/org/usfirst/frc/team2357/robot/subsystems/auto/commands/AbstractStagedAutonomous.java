@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.command.WaitCommand;
  * A base class for autonomous commands that might go for more than one cube.
  */
 public abstract class AbstractStagedAutonomous extends AbstractStateCommandGroup {
+	public static final double STANDARD_AUTO_SPEED = 0.6;
 	protected final AutonomousSubsystem as;
 
 	public AbstractStagedAutonomous() {
@@ -30,20 +31,20 @@ public abstract class AbstractStagedAutonomous extends AbstractStateCommandGroup
 			}
 			switch (cube1EndingPosition) {
 			case SIDE_OF_LEFT_SWITCH:
-				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 40.0, -0.7, 0.7));
+				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 40.0, -STANDARD_AUTO_SPEED, STANDARD_AUTO_SPEED));
 				addParallel(new GotoElevatorPositionCommand(Floors.CARRY));
-				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 40.0, 0.7, 0.0));
+				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 40.0, STANDARD_AUTO_SPEED, 0.0));
 				// TODO add command to detect and center on cube.
 				addParallel(new GotoElevatorPositionCommand(Floors.FLOOR));
 				// TODO add parallel intake inward.
-				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 30.0, 0.0, -0.7));
+				addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 30.0, 0.0, -STANDARD_AUTO_SPEED));
 				if (cubeTwoOption == CubeTwoOptions.SAME) {
-					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 20.0, 0.7, 0.7));
+					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 20.0, STANDARD_AUTO_SPEED, STANDARD_AUTO_SPEED));
 					addSequential(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
-					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 30.0, 0.0, -0.7));
+					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 30.0, 0.0, -STANDARD_AUTO_SPEED));
 					// TODO add sequential command for intake outward.
 				} else {
-					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 20.0, 0.0, 0.7));
+					addSequential(new AutoDriveSegment(FixedIntakeDirection.DOWN_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED));
 					if (as.getScaleSide() == PlatformSide.LEFT) {
 						// TODO do the steps to score left scale from here.
 					} else {

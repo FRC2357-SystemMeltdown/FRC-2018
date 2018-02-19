@@ -38,32 +38,32 @@ public class ElevatorSubsystem extends Subsystem {
 		/**
 		 * Please keep your cube inside the ride.
 		 */
-		CARRY(100),
+		CARRY(200),
 
 		/**
 		 * Eject your cube for a switch.
 		 */
-		SCORE_SWITCH(200),
+		SCORE_SWITCH(400),
 
 		/**
 		 * Cube pile on the scale!!!
 		 */
-		SCORE_SCALE_WE_OWN(300),
+		SCORE_SCALE_WE_OWN(600),
 
 		/**
 		 * Excuse me while I take ownership of that scale.
 		 */
-		SCORE_SCALE_AT_NEUTRAL(400),
+		SCORE_SCALE_AT_NEUTRAL(800),
 
 		/**
 		 * All your scale are belong to us.
 		 */
-		SCORE_SCALE_THEY_OWN(500),
+		SCORE_SCALE_THEY_OWN(1000),
 
 		/**
 		 * Get that hook just above that rung.
 		 */
-		CLIMB_INITIATION(450);
+		CLIMB_INITIATION(900);
 
 		private final int clicksFromGround;
 

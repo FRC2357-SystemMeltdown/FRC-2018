@@ -15,9 +15,6 @@ public class IntakeSub extends Subsystem {
 	private final WPI_TalonSRX intakeMotor1 = new WPI_TalonSRX(RobotMap.INTAKE_MOTOR_1);
 	private final WPI_TalonSRX intakeMotor2 = new WPI_TalonSRX(RobotMap.INTAKE_MOTOR_2);
 
-	private final double INTAKE_IN_SPEED = 0.7;
-	private final double INTAKE_OUT_SPEED = 0.7;
-
 	public IntakeSub() {
 
 	}
@@ -26,14 +23,14 @@ public class IntakeSub extends Subsystem {
 
 	}
 
-	public void intakeIn() {
-		intakeMotor1.set(ControlMode.PercentOutput, INTAKE_IN_SPEED);
-		intakeMotor2.set(ControlMode.PercentOutput, -INTAKE_IN_SPEED);
+	public void intakeIn(double speed) {
+		intakeMotor1.set(ControlMode.PercentOutput, speed);
+		intakeMotor2.set(ControlMode.PercentOutput, -speed);
 	}
 
-	public void intakeOut() {
-		intakeMotor1.set(ControlMode.PercentOutput, -INTAKE_OUT_SPEED);
-		intakeMotor2.set(ControlMode.PercentOutput, INTAKE_OUT_SPEED);
+	public void intakeOut(double speed) {
+		intakeMotor1.set(ControlMode.PercentOutput, -speed);
+		intakeMotor2.set(ControlMode.PercentOutput, speed);
 	}
 
 	public void stop() {

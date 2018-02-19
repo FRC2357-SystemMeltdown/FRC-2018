@@ -10,17 +10,17 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class IntakeOutCommand extends Command {
 
-	protected IntakeSub intakeSub;
+	private final IntakeSub intakeSub;
+	private final double speed;
 
-	public IntakeOutCommand() {
-		// Use requires() here to declare subsystem dependencies
-		// eg. requires(chassis);
+	public IntakeOutCommand(double speed) {
 		requires(intakeSub = Robot.getInstance().getIntakeSubsystem());
+		this.speed = speed;
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		intakeSub.intakeOut();
+		intakeSub.intakeOut(this.speed);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
