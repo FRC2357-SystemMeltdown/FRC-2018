@@ -41,19 +41,19 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		 * Cartesian movement is relative to the right side of the robot with the X and Y
 		 * components derived from the position of the movement stick.
 		 */
-		ROBOT_RELATIVE_90,
+		//ROBOT_RELATIVE_90,
 		
 		/**
 		 * Cartesian movement is relative to the back side of the robot with the X and Y
 		 * components derived from the position of the movement stick.
 		 */
-		ROBOT_RELATIVE_180,
+		//ROBOT_RELATIVE_180,
 		
 		/**
 		 * Cartesian movement is relative to the left side of the robot with the X and Y
 		 * components derived from the position of the movement stick.
 		 */
-		ROBOT_RELATIVE_270,
+		//ROBOT_RELATIVE_270,
 
 		/**
 		 * Cartesian movement is relative to the field with the X and Y components
@@ -229,6 +229,7 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 			this.rotationController.reset();
 			if (this.fixedIntakeDirection != null) {
 				this.stickRotationDetected = false;
+				this.rotationController.setSetpoint(this.fixedIntakeDirection.getHeading());
 				this.rotationController.enable();
 			} else {
 				this.stickRotationDetected = true;
@@ -268,17 +269,18 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, -this.getGyroYaw());
 			break;
 		case ROBOT_RELATIVE:
-			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 0.0);
-			break;
-		case ROBOT_RELATIVE_90:
-			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 90.0);
-			break;
-		case ROBOT_RELATIVE_180:
-			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 180.0);
-			break;
-		case ROBOT_RELATIVE_270:
+			//this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 0.0);
 			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, -90.0);
 			break;
+//		case ROBOT_RELATIVE_90:
+//			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 90.0);
+//			break;
+//		case ROBOT_RELATIVE_180:
+//			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, 180.0);
+//			break;
+//		case ROBOT_RELATIVE_270:
+//			this.mecanumDrive.driveCartesian(ySpeed, xSpeed, rotation, -90.0);
+//			break;
 		}
 		for(int i = 0; i < motors.size(); i++){
 			WPI_TalonSRX tempMotor = motors.get(i);
@@ -478,7 +480,7 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		 * {@link Double#parseDouble(String)} or the default value will be used.
 		 */
 		public static final String ROTATE_PID_P_KEY = "drive.rotate.pid.p";
-		public static final double ROTATE_PID_P_DEFAULT = 0.03;
+		public static final double ROTATE_PID_P_DEFAULT = 0.02;
 		private double rotatePIDp = ROTATE_PID_P_DEFAULT;
 
 		/**

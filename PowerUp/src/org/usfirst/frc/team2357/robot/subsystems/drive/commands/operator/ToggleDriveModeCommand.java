@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class ChangeDriveModeRightCommand extends Command {
+public class ToggleDriveModeCommand extends Command {
 	
 	protected DriveSubsystem driveSub;
 
-    public ChangeDriveModeRightCommand() {
+    public ToggleDriveModeCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(driveSub = Robot.getInstance().getDriveSubsystem());
@@ -21,8 +21,8 @@ public class ChangeDriveModeRightCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	//driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_90);
-    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE);
+    	DriveMode mode = driveSub.getDriveMode();
+    	driveSub.setDriveMode(mode == DriveMode.FIELD_RELATIVE ? DriveMode.ROBOT_RELATIVE : DriveMode.FIELD_RELATIVE);
     }
 
     // Make this return true when this Command no longer needs to run execute()

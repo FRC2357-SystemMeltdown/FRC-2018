@@ -301,15 +301,15 @@ public class Robot extends IterativeRobot {
 		case ROBOT_RELATIVE:
 			SmartDashboard.putString("Drive Mode", "Robot Relative");
 			break;
-		case ROBOT_RELATIVE_90:
-			SmartDashboard.putString("Drive Mode", "Robot Relative 90");
-			break;
-		case ROBOT_RELATIVE_180:
-			SmartDashboard.putString("Drive Mode", "Robot Relative 180");
-			break;
-		case ROBOT_RELATIVE_270:
-			SmartDashboard.putString("Drive Mode", "Robot Relative 270");
-			break;
+//		case ROBOT_RELATIVE_90:
+//			SmartDashboard.putString("Drive Mode", "Robot Relative 90");
+//			break;
+//		case ROBOT_RELATIVE_180:
+//			SmartDashboard.putString("Drive Mode", "Robot Relative 180");
+//			break;
+//		case ROBOT_RELATIVE_270:
+//			SmartDashboard.putString("Drive Mode", "Robot Relative 270");
+//			break;
 		}
 		SmartDashboard.putNumber("Front Left Encoder Out", driveSubsystem.getFrontLeftMotor().getSelectedSensorVelocity(0));
 	}

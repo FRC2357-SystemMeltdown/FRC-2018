@@ -21,7 +21,8 @@ public class ChangeDriveModeLeftCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_270);
+    	//driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE_270);
+    	driveSub.setDriveMode(DriveMode.ROBOT_RELATIVE);
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -4,11 +4,7 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirec
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionLeft;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionRight;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionUp;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeBackCommand;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeFieldCommand;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeForwardCommand;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeLeftCommand;
-import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ChangeDriveModeRightCommand;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ToggleDriveModeCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ZeroGyroCommand;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem.Floors;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.GotoElevatorPositionCommand;
@@ -16,8 +12,6 @@ import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.ManualElevato
 import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeInCommand;
 import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeOutCommand;
 import org.usfirst.frc.team2357.robot.triggers.DPadDownTrigger;
-import org.usfirst.frc.team2357.robot.triggers.DPadLeftTrigger;
-import org.usfirst.frc.team2357.robot.triggers.DPadRightTrigger;
 import org.usfirst.frc.team2357.robot.triggers.DPadUpTrigger;
 import org.usfirst.frc.team2357.robot.triggers.TwoButtonTrigger;
 
@@ -42,10 +36,10 @@ public class OI {
 	private Button startButton;
 	private Button leftStickButton;
 	private Button rightStickButton;
-	private DPadUpTrigger up;
-	private DPadRightTrigger right;
-	private DPadDownTrigger down;
-	private DPadLeftTrigger left;
+//	private DPadUpTrigger up;
+//	private DPadRightTrigger right;
+//	private DPadDownTrigger down;
+//	private DPadLeftTrigger left;
 	
 	private XboxController coController;
 	private Button floor;
@@ -76,10 +70,10 @@ public class OI {
 		startButton = new JoystickButton(getDriveController(), 8);
 		leftStickButton = new JoystickButton(getDriveController(), 9);
 		rightStickButton = new JoystickButton(getDriveController(), 10);
-		up = new DPadUpTrigger(driveController);
-		right = new DPadRightTrigger(driveController);
-		down = new DPadDownTrigger(driveController);
-		left = new DPadLeftTrigger(driveController);
+//		up = new DPadUpTrigger(driveController);
+//		right = new DPadRightTrigger(driveController);
+//		down = new DPadDownTrigger(driveController);
+//		left = new DPadLeftTrigger(driveController);
 
 		coController = new XboxController(1);
 		floor = new JoystickButton(getCoController(), 1); // A
@@ -98,11 +92,12 @@ public class OI {
 	}
 	
 	public void initCommands(){
-		startButton.whenPressed(new ChangeDriveModeFieldCommand());
-		up.whenActive(new ChangeDriveModeForwardCommand());
-		right.whenActive(new ChangeDriveModeRightCommand());
-		down.whenActive(new ChangeDriveModeBackCommand());
-		left.whenActive(new ChangeDriveModeLeftCommand());
+		startButton.whenPressed(new ToggleDriveModeCommand());
+//		startButton.whenPressed(new ChangeDriveModeFieldCommand());
+//		up.whenActive(new ChangeDriveModeForwardCommand());
+//		right.whenActive(new ChangeDriveModeRightCommand());
+//		down.whenActive(new ChangeDriveModeBackCommand());
+//		left.whenActive(new ChangeDriveModeLeftCommand());
 		a.whenPressed(new ChangeDirectionDown());
 		b.whenPressed(new ChangeDirectionRight());
 		x.whenPressed(new ChangeDirectionLeft());
