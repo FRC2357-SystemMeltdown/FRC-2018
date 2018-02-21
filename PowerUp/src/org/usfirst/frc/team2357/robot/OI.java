@@ -109,7 +109,7 @@ public class OI {
 		scoreScale.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
 		climb.whenPressed(new GotoElevatorPositionCommand(Floors.CLIMB_INITIATION));
 		manualElevator.whileHeld(new ManualElevatorCommand());
-		intakeIn.whileActive(new IntakeInCommand(0.6));
+		intakeIn.whileActive(new IntakeInCommand(0.7));
 		intakeOut.whileActive(new IntakeOutCommand(0.6));
 
 		resetGyro.whenActive(new ZeroGyroCommand());
