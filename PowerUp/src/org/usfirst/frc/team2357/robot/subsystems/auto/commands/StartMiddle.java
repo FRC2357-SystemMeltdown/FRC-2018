@@ -13,16 +13,17 @@ import org.usfirst.frc.team2357.robot.subsystems.intake.commands.TimedIntakeOutC
 import edu.wpi.first.wpilibj.command.WaitCommand;
 
 /**
- * Command for starting in front of the right switch plate.
+ * Command for starting in the middle. For now this is switch only.
  */
-public class StartRightSwitch extends AbstractStagedAutonomous {
-	public StartRightSwitch() {
+public class StartMiddle extends AbstractStagedAutonomous {
+	public StartMiddle() {
 		super();
 		PlatformSide switchSide = as.getSwitchSide();
 		PlatformSide scaleSide = as.getScaleSide();
-		TargetPreference tp = as.getTargetPreference();
+		// TargetPreference tp = as.getTargetPreference();
+		TargetPreference tp = TargetPreference.ALWAYS_SWITCH;
 		Cube1EndingPosition cube1EndingPosition = null;
-		
+
 		// This will start the intake dropping...
 		Robot.getInstance().getIntakeSubsystem().setState(IntakeState.LOWERING);
 
@@ -34,40 +35,25 @@ public class StartRightSwitch extends AbstractStagedAutonomous {
 				&& (((tp == TargetPreference.ALWAYS_SWITCH) || (tp == TargetPreference.PREFER_SWITCH))
 						|| ((tp == TargetPreference.PREFER_SCALE) && (scaleSide == PlatformSide.LEFT)))) {
 			// Got here if there are any conditions that lead to right switch.
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, STANDARD_AUTO_SPEED, 0.0, 3.0));
 			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
 			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
 			cube1EndingPosition = Cube1EndingPosition.FRONT_OF_RIGHT_SWITCH;
 		} else if ((scaleSide == PlatformSide.RIGHT) && (tp != TargetPreference.ALWAYS_SWITCH)) {
-			// Got here if there are any conditions that lead to right scale.
-			// TODO check these drive distances.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, STANDARD_AUTO_SPEED, 0.0));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.0, STANDARD_AUTO_SPEED));
-			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 70.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
-			cube1EndingPosition = Cube1EndingPosition.RIGHT_SCALE;
+
 		} else if ((tp == TargetPreference.ALWAYS_SWITCH) || (tp == TargetPreference.PREFER_SWITCH)) {
 			// Got here if there are any conditions that lead to left switch.
 			// TODO check these drive distances.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, -STANDARD_AUTO_SPEED, 0.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, -STANDARD_AUTO_SPEED, 0.0, 3.0));
 			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.0, STANDARD_AUTO_SPEED));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
 			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
 			cube1EndingPosition = Cube1EndingPosition.FRONT_OF_LEFT_SWITCH;
 		} else {
-			// Got here if there are any conditions that lead to left scale.
-			// TODO check these drive distances.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, STANDARD_AUTO_SPEED, 0.0));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 200.0, -STANDARD_AUTO_SPEED, 0.0));
-			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 40.0, 0.0, STANDARD_AUTO_SPEED));
-			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
-			cube1EndingPosition = Cube1EndingPosition.LEFT_SCALE;
+
 		}
 		// addCube2Commands(cube1EndingPosition);
 	}
