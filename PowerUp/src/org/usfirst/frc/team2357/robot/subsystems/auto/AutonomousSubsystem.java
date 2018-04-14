@@ -32,7 +32,7 @@ public class AutonomousSubsystem extends Subsystem {
 		this.targetPrefernceChooser = new SendableChooser<>();
 		TargetPreference[] positions = TargetPreference.values();
 		for (TargetPreference position : positions) {
-			if (position == TargetPreference.PREFER_SWITCH) {
+			if (position == TargetPreference.ALWAYS_SWITCH) {
 				this.targetPrefernceChooser.addDefault(position.name(), position);
 			} else {
 				this.targetPrefernceChooser.addObject(position.name(), position);
@@ -164,5 +164,9 @@ public class AutonomousSubsystem extends Subsystem {
 	 */
 	public CubeTwoOptions getCubeTwoOption() {
 		return this.cube2Option;
+	}
+
+	public AutonomousChooser getAutonomousChooser() {
+		return autonomousChooser;
 	}
 }

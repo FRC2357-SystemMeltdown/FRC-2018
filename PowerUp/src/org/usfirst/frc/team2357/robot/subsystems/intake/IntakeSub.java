@@ -20,6 +20,7 @@ public class IntakeSub extends Subsystem {
 	private final VictorSP dropMotor = new VictorSP(RobotMap.INTAKE_DROP_MOTOR);
 	
 	private IntakeState state = IntakeState.RAISED;
+	private boolean stateEnabled = true;
 	
 	public enum IntakeState {
 		RAISED,
@@ -36,7 +37,7 @@ public class IntakeSub extends Subsystem {
 	}
 
 	public void initDefaultCommand() {
-		new IntakeStateCommand();
+		setDefaultCommand(new IntakeStateCommand());
 	}
 
 	public void intakeIn(double speed) {
@@ -48,6 +49,11 @@ public class IntakeSub extends Subsystem {
 		intakeMotor1.set(ControlMode.PercentOutput, -speed);
 		intakeMotor2.set(ControlMode.PercentOutput, speed);
 	}
+	
+	public void intakeRotate(double speed){
+		intakeMotor1.set(ControlMode.PercentOutput, speed);
+		intakeMotor2.set(ControlMode.PercentOutput, speed);
+	}
 
 	public void stop() {
 		intakeMotor1.set(ControlMode.PercentOutput, 0.0);
@@ -56,11 +62,19 @@ public class IntakeSub extends Subsystem {
 	}
 	
 	public void raiseIntake() {
-		dropMotor.set(0.5);
+		dropMotor.set(1.0);
 	}
 	
 	public void lowerIntake(){
-		dropMotor.set(-0.5);
+		dropMotor.set(-0.9);
+	}
+	
+	public void stopRaiseLowerIntake(){
+		dropMotor.set(0);
+	}
+	
+	public void setDropMotor(int speed){
+		dropMotor.set(speed);
 	}
 
 	public IntakeState getState() {
@@ -69,6 +83,14 @@ public class IntakeSub extends Subsystem {
 
 	public void setState(IntakeState state) {
 		this.state = state;
+	}
+	
+	public boolean isStateEnabled(){
+		return stateEnabled;
+	}
+	
+	public void setStateEnabled(boolean stateEnabled){
+		this.stateEnabled = stateEnabled;
 	}
 	
 }

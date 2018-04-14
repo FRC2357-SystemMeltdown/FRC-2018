@@ -9,6 +9,8 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.DriveMode;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.intake.IntakeSub;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -95,6 +97,8 @@ public class Robot extends IterativeRobot {
 		this.autonomousSubsystem = new AutonomousSubsystem();
 		this.oi = new OI();
 		this.oi.initCommands();
+		UsbCamera visionCamera = CameraServer.getInstance().startAutomaticCapture();
+		SmartDashboard.putData("Auto Mode", autonomousSubsystem.getAutonomousChooser().getChooser());
 	}
 
 	/**
@@ -253,6 +257,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+//		this.getIntakeSubsystem().setStateEnabled(true);
+//		this.intakeSubsystem.setState(IntakeSub.IntakeState.LOWERING);
 		this.getDriveSubsystem().setDriveMode(DriveMode.FIELD_RELATIVE);
 		this.getAutonomousSubsystem().autonomousInit();
 	}
@@ -281,6 +287,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		this.getDriveSubsystem().setDriveMode(this.getDriveSubsystem().getInitialTeleDriveMode());
 		this.getAutonomousSubsystem().teleopInit();
+		this.getIntakeSubsystem().setStateEnabled(false);
 	}
 
 	/**

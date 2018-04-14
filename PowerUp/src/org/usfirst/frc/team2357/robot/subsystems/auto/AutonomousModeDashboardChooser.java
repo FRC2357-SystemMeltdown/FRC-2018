@@ -26,7 +26,6 @@ class AutonomousModeDashboardChooser implements AutonomousChooser {
 				this.chooser.addObject(autonomousMode.name(), autonomousMode);
 			}
 		}
-		SmartDashboard.putData("Auto mode", chooser);
 	}
 
 	/**
@@ -37,4 +36,9 @@ class AutonomousModeDashboardChooser implements AutonomousChooser {
 		AutonomousMode automode = chooser.getSelected();
 		return automode == null ? AutonomousMode.getDefault() : automode;
 	}
+
+	public SendableChooser<AutonomousMode> getChooser() {
+		return chooser;
+	}
+
 }

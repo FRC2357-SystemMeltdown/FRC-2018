@@ -12,11 +12,12 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class IntakeStateCommand extends Command {
-	public static final long RAISED_LOCATION = 1000;
+	public static final long RAISED_LOCATION = 7650;
 	public static final long LOWERED_LOCATION = 0;
 	private IntakeSub intakeSub = Robot.getInstance().getIntakeSubsystem();
 	private long location = RAISED_LOCATION;
 	private long deltaTime = 0;
+	private long lastTime = 0;
 
     public IntakeStateCommand() {
     	requires(intakeSub);
@@ -24,34 +25,42 @@ public class IntakeStateCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-		switch (intakeSub.getState()) {
-		case RAISED:
-			deltaTime = System.currentTimeMillis();
-			break;
-		case LOWERED:
-			deltaTime = System.currentTimeMillis();
-			break;
-		case RAISING:
-			intakeSub.raiseIntake();
-			location += (System.currentTimeMillis() - deltaTime);
-			deltaTime = System.currentTimeMillis();
-			if (location >= RAISED_LOCATION) {
-				intakeSub.setState(IntakeState.RAISED);
-				location = RAISED_LOCATION;
-			}
-			break;
-		case LOWERING:
-			intakeSub.lowerIntake();
-			location -= (System.currentTimeMillis() - deltaTime);
-			deltaTime = System.currentTimeMillis();
-			if (location <= LOWERED_LOCATION) {
-				intakeSub.setState(IntakeState.LOWERED);
-				location = LOWERED_LOCATION;
-			}
-			break;
-		default:
-			Robot.getInstance().getLogger().log(Level.WARNING, "IntakeState not set.");
-		}
+    	if(intakeSub.isStateEnabled()){
+    		switch (intakeSub.getState()) {
+    		case RAISED:
+    			intakeSub.stopRaiseLowerIntake();
+    			lastTime = System.currentTimeMillis();
+    			deltaTime = 0;
+    			break;
+    		case LOWERED:
+    			intakeSub.stopRaiseLowerIntake();
+    			lastTime = System.currentTimeMillis();
+    			deltaTime = 0;
+    			break;
+    		case RAISING:
+    			intakeSub.raiseIntake();
+    			deltaTime = System.currentTimeMillis() - lastTime;
+    			lastTime = System.currentTimeMillis();
+    			location += deltaTime;
+    			if (location >= RAISED_LOCATION) {
+    				intakeSub.setState(IntakeState.RAISED);
+    				location = RAISED_LOCATION;
+    			}
+    			break;
+    		case LOWERING:
+    			intakeSub.lowerIntake();
+    			deltaTime = System.currentTimeMillis() - lastTime;
+    			lastTime = System.currentTimeMillis();
+    			location -= deltaTime;
+    			if (location <= LOWERED_LOCATION) {
+    				intakeSub.setState(IntakeState.LOWERED);
+    				location = LOWERED_LOCATION;
+    			}
+    			break;
+    		default:
+    			Robot.getInstance().getLogger().log(Level.WARNING, "IntakeState not set.");
+    		}
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -359,8 +359,8 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	 */
 	public int startMoveInches(double inches) {
 		enableMoveInches();
-		return (int) ((inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
-				* this.props.encoderClicksPerRev);
+		return Math.abs((int) ((inches / this.props.effectiveWheelCircumference) * this.props.effectiveEncoderRevPerWheelRev
+				* this.props.encoderClicksPerRev));
 	}
 
 	/**
@@ -409,21 +409,27 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 	public double getTargetObtainedPercentage(int targetClicks) {
 		int[] clicks = new int[4];
 		int max = 0;
-		clicks[0] = this.frontLeftMotor.getSensorCollection().getQuadraturePosition();
+		clicks[0] = Math.abs(this.frontLeftMotor.getSensorCollection().getQuadraturePosition());
 		max = clicks[0];
-		clicks[1] = this.frontRightMotor.getSensorCollection().getQuadraturePosition();
+		clicks[1] = Math.abs(this.frontRightMotor.getSensorCollection().getQuadraturePosition());
 		max = Math.max(max, clicks[1]);
-		clicks[2] = this.backLeftMotor.getSensorCollection().getQuadraturePosition();
+		clicks[2] = Math.abs(this.backLeftMotor.getSensorCollection().getQuadraturePosition());
 		max = Math.max(max, clicks[2]);
-		clicks[3] = this.backRightMotor.getSensorCollection().getQuadraturePosition();
+		clicks[3] = Math.abs(this.backRightMotor.getSensorCollection().getQuadraturePosition());
 		max = Math.max(max, clicks[3]);
 		int total = 0;
 		int encodersInTotal = 0;
+		if(max == 0){
+			return 0.0;
+		}
 		for (int i = 0; i < clicks.length; i++) {
 			if ((((double)clicks[i]) / ((double)max)) > 0.8) {
 				total += clicks[i];
 				encodersInTotal++;
 			}
+		}
+		if(encodersInTotal == 0){
+			return 0.0;
 		}
 		return (double)total / (double)encodersInTotal / (double)targetClicks;
 	}
@@ -505,7 +511,7 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		 * {@link Double#parseDouble(String)} or the default value will be used.
 		 */
 		public static final String EFFECTIVE_WHEEL_CIRCUMFERENCE_KEY = "drive.effective.wheel.circumference";
-		public static final double EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT = 18.85;
+		public static final double EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT = 23.5625;
 		private double effectiveWheelCircumference = EFFECTIVE_WHEEL_CIRCUMFERENCE_DEFAULT;
 
 		/**
@@ -520,7 +526,7 @@ public class DriveSubsystem extends Subsystem implements PIDOutput {
 		private double effectiveEncoderRevPerWheelRev = EFFECTIVE_ENCODER_REV_PER_WHEEL_REV_DEFAULT;
 
 		public static final String ENCODER_CLICKS_PER_REV_KEY = "drive.encoder.clicks.per.rev";
-		public static final double ENCODER_CLICKS_PER_REV_DEFAULT = 256.0;
+		public static final double ENCODER_CLICKS_PER_REV_DEFAULT = 1024.0;
 		private double encoderClicksPerRev = ENCODER_CLICKS_PER_REV_DEFAULT;
 
 		/**

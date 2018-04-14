@@ -8,6 +8,8 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.DriveSubsystem.FixedIntak
 import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem.Floors;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.GotoElevatorPositionCommand;
 import org.usfirst.frc.team2357.robot.subsystems.intake.IntakeSub.IntakeState;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeRaiseManual;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.SetManualIntake;
 import org.usfirst.frc.team2357.robot.subsystems.intake.commands.TimedIntakeOutCommand;
 
 import edu.wpi.first.wpilibj.command.WaitCommand;
@@ -25,20 +27,21 @@ public class StartMiddle extends AbstractStagedAutonomous {
 		Cube1EndingPosition cube1EndingPosition = null;
 
 		// This will start the intake dropping...
-		Robot.getInstance().getIntakeSubsystem().setState(IntakeState.LOWERING);
+		addSequential(new SetManualIntake(true));
+    	addParallel(new IntakeRaiseManual(-1), 2.0);
 
 		if (as.getAutoStartWaitTime() > 0.0) {
 			addSequential(new WaitCommand(as.getAutoStartWaitTime()));
 		}
-		addSequential(new GotoElevatorPositionCommand(Floors.CARRY));
+		//addSequential(new GotoElevatorPositionCommand(Floors.CARRY));
 		if ((switchSide == PlatformSide.RIGHT)
 				&& (((tp == TargetPreference.ALWAYS_SWITCH) || (tp == TargetPreference.PREFER_SWITCH))
 						|| ((tp == TargetPreference.PREFER_SCALE) && (scaleSide == PlatformSide.LEFT)))) {
 			// Got here if there are any conditions that lead to right switch.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 70.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
 			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, STANDARD_AUTO_SPEED, 0.0, 3.0));
-			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 100.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
+			//addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 70.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
 			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
 			cube1EndingPosition = Cube1EndingPosition.FRONT_OF_RIGHT_SWITCH;
 		} else if ((scaleSide == PlatformSide.RIGHT) && (tp != TargetPreference.ALWAYS_SWITCH)) {
@@ -46,10 +49,10 @@ public class StartMiddle extends AbstractStagedAutonomous {
 		} else if ((tp == TargetPreference.ALWAYS_SWITCH) || (tp == TargetPreference.PREFER_SWITCH)) {
 			// Got here if there are any conditions that lead to left switch.
 			// TODO check these drive distances.
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 20.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 60.0, -STANDARD_AUTO_SPEED, 0.0, 3.0));
-			addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
-			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 120.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 70.0, 0.0, STANDARD_AUTO_SPEED, 1.0));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, -80.0, -STANDARD_AUTO_SPEED, 0.0, 3.0));
+			//addParallel(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
+			addSequential(new AutoDriveSegment(FixedIntakeDirection.UP_FIELD, 70.0, 0.0, STANDARD_AUTO_SPEED, 5.0));
 			addSequential(new TimedIntakeOutCommand(2.0, 0.6));
 			cube1EndingPosition = Cube1EndingPosition.FRONT_OF_LEFT_SWITCH;
 		} else {

@@ -18,10 +18,12 @@ enum AutonomousMode {
 	DriveAutoline(() -> new DriveAutoLine()),
 
 	/** Start all the way to the left. */
-	StartFarLeft(() -> new StartFarLeft()),
+    //StartFarLeft(() -> new StartFarLeft()),
 
 	/** Start across from the right switch plate. */
-	StartRightSwitch(() -> new StartRightSwitch());
+	//StartRightSwitch(() -> new StartRightSwitch()),
+	
+	StartMiddle(() -> new org.usfirst.frc.team2357.robot.subsystems.auto.commands.StartMiddleSwitch());
 
 	private final Supplier<Command> autoCommandSupplier;
 	private Command autoCommand;

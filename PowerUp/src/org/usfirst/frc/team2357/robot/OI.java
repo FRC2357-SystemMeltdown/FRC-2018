@@ -4,6 +4,7 @@ import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirec
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionLeft;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionRight;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.auto.ChangeDirectionUp;
+import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.DriveSlowCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ToggleDriveModeCommand;
 import org.usfirst.frc.team2357.robot.subsystems.drive.commands.operator.ZeroGyroCommand;
 import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem.Floors;
@@ -11,7 +12,13 @@ import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.GotoElevatorP
 import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.ManualElevatorCommand;
 import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeInCommand;
 import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeOutCommand;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeRaiseManual;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.IntakeStateCycleCommand;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.RotateCubeCommand;
+import org.usfirst.frc.team2357.robot.subsystems.intake.commands.ToggleManualIntake;
 import org.usfirst.frc.team2357.robot.triggers.DPadDownTrigger;
+import org.usfirst.frc.team2357.robot.triggers.DPadLeftTrigger;
+import org.usfirst.frc.team2357.robot.triggers.DPadRightTrigger;
 import org.usfirst.frc.team2357.robot.triggers.DPadUpTrigger;
 import org.usfirst.frc.team2357.robot.triggers.TwoButtonTrigger;
 
@@ -42,20 +49,24 @@ public class OI {
 //	private DPadLeftTrigger left;
 	
 	private XboxController coController;
-	private Button floor;
-	private Button carry;
-	private Button scoreSwitch;
-	private Button scoreScale;
-	private Button climb;
-	private Button manualElevator;
+	private Button coA;
+	private Button coX;
+	private Button coB;
+	private Button coY;
+	private Button coRB;
+	private Button coLB;
+	private Button coStart;
 	private Button coBackButton;
-	private DPadDownTrigger intakeIn;
-	private DPadUpTrigger intakeOut;
+	private DPadDownTrigger coDPDown;
+	private DPadUpTrigger coDPUp;
+	private DPadLeftTrigger coDPLeft;
+	private DPadRightTrigger coDPRight;
 
 	private TwoButtonTrigger resetGyro;
 
 	private static final double STICK_ROTATION_MIN_DEFLECTION = 0.1;
 	private static final double STICK_ELEVATOR_MIN_DEFLECTION = 0.1;
+	private boolean slow = false;
 
 	public OI() {
 		driveController = new XboxController(0);
@@ -76,14 +87,17 @@ public class OI {
 //		left = new DPadLeftTrigger(driveController);
 
 		coController = new XboxController(1);
-		floor = new JoystickButton(getCoController(), 1); // A
-		carry = new JoystickButton(getCoController(), 3); // X
-		scoreSwitch = new JoystickButton(getCoController(), 2); // B
-		scoreScale = new JoystickButton(getCoController(), 4); // Y
-		climb = new JoystickButton(getCoController(), 6); // Right bumper
-		manualElevator = new JoystickButton(getCoController(), 5); // Left bumper
-		intakeIn = new DPadDownTrigger(coController);
-		intakeOut = new DPadUpTrigger(coController);
+		coA = new JoystickButton(getCoController(), 1); // A
+		coX = new JoystickButton(getCoController(), 3); // X
+		coB = new JoystickButton(getCoController(), 2); // B
+		coY = new JoystickButton(getCoController(), 4); // Y
+		coRB = new JoystickButton(getCoController(), 6); // Right bumper
+		coLB = new JoystickButton(getCoController(), 5); // Left bumper
+		coStart = new JoystickButton(getCoController(), 8);
+		coDPDown = new DPadDownTrigger(coController);
+		coDPUp = new DPadUpTrigger(coController);
+		coDPLeft = new DPadLeftTrigger(coController);
+		coDPRight = new DPadRightTrigger(coController);
 		// DO NOT USE coBackButton
 		coBackButton = new JoystickButton(getCoController(), 7);
 
@@ -102,15 +116,22 @@ public class OI {
 		b.whenPressed(new ChangeDirectionRight());
 		x.whenPressed(new ChangeDirectionLeft());
 		y.whenPressed(new ChangeDirectionUp());
+		leftBumper.whenPressed(new DriveSlowCommand());
 
-		floor.whenPressed(new GotoElevatorPositionCommand(Floors.FLOOR));
+		/*floor.whenPressed(new GotoElevatorPositionCommand(Floors.FLOOR));
 		carry.whenPressed(new GotoElevatorPositionCommand(Floors.CARRY));
 		scoreSwitch.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SWITCH));
 		scoreScale.whenPressed(new GotoElevatorPositionCommand(Floors.SCORE_SCALE_THEY_OWN));
-		climb.whenPressed(new GotoElevatorPositionCommand(Floors.CLIMB_INITIATION));
-		manualElevator.whileHeld(new ManualElevatorCommand());
-		intakeIn.whileActive(new IntakeInCommand(0.7));
-		intakeOut.whileActive(new IntakeOutCommand(0.6));
+		climb.whenPressed(new GotoElevatorPositionCommand(Floors.CLIMB_INITIATION));*/
+		coStart.whenActive(new ToggleManualIntake());
+		//coLB.whileHeld(new ManualElevatorCommand());
+		coDPDown.whileActive(new IntakeInCommand(0.8));
+		coDPUp.whileActive(new IntakeOutCommand(0.4));
+		coDPLeft.whenActive(new IntakeStateCycleCommand());
+		coDPLeft.whileActive(new IntakeRaiseManual(1));
+		coDPRight.whileActive(new IntakeRaiseManual(-1));
+		coX.whileHeld(new RotateCubeCommand(.4));
+		coB.whileHeld(new RotateCubeCommand(-.4));
 
 		resetGyro.whenActive(new ZeroGyroCommand());
 	}
@@ -120,7 +141,7 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no Y movement.
 	 */
 	public double getYMoveValue() {
-		double speed = -getDriveController().getY(Hand.kLeft);
+		double speed = -getDriveController().getY(Hand.kLeft) / (isSlow() ? 1.5 : 1);
 		if (Math.abs(speed) < STICK_ROTATION_MIN_DEFLECTION) {
 			speed = 0.0;
 		}
@@ -132,7 +153,7 @@ public class OI {
 	 *         -1.0 and 1.0 where 0.0 is no X movement.
 	 */
 	public double getXMoveValue() {
-		double speed = -getDriveController().getX(Hand.kLeft);
+		double speed = -getDriveController().getX(Hand.kLeft) / (isSlow() ? 2 : 1);
 		if (Math.abs(speed) < STICK_ROTATION_MIN_DEFLECTION) {
 			speed = 0.0;
 		}
@@ -144,7 +165,7 @@ public class OI {
 	 *         0.0 is no rotation.
 	 */
 	public double getRotationX() {
-		double rotation = getDriveController().getX(Hand.kRight);
+		double rotation = getDriveController().getX(Hand.kRight) / (isSlow() ? 2 : 1);
 		if (Math.abs(rotation) < STICK_ROTATION_MIN_DEFLECTION) {
 			rotation = 0.0;
 		}
@@ -163,14 +184,23 @@ public class OI {
 	 * @return the manual elevator speed. The value is between -1.0 and 1.0.
 	 */
 	public double getManualElevatorSpeed() {
-		double speed = getCoController().getY(Hand.kRight);
+		double speed = getCoController().getY(Hand.kRight)*.8;
 		if (Math.abs(speed) < STICK_ELEVATOR_MIN_DEFLECTION) {
 			speed = 0.0;
 		}
+		System.out.println("Manual Elevator Speed: " + speed);
 		return cubedInputs(speed);
 	}
 
 	private static double cubedInputs(double raw) {
 		return Math.pow(raw, 3.0);
+	}
+	
+	public boolean isSlow(){
+		return slow;
+	}
+	
+	public void setSlow(boolean slow){
+		this.slow = slow;
 	}
 }

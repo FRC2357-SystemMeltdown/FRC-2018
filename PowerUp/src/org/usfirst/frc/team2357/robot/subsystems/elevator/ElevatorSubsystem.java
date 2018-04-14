@@ -5,6 +5,8 @@ import org.usfirst.frc.team2357.robot.RobotMap;
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationPropertiesConsumer;
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationSubsystem;
 import org.usfirst.frc.team2357.robot.subsystems.configuration.ConfigurationUtilities;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.ManualElevatorCommand;
+import org.usfirst.frc.team2357.robot.subsystems.elevator.commands.ElevatorCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -102,7 +104,8 @@ public class ElevatorSubsystem extends Subsystem {
 		super();
 		Robot.getInstance().getConfigurationSubsystem().addConsumer(this.props);
 
-		configMotorForPosition(this.elevatorMotor, this.lastTargetClicksSentToTalon);
+		//configMotorForPosition(this.elevatorMotor, this.lastTargetClicksSentToTalon);
+		setManualMode(true);
 	}
 
 	private void configMotorForPosition(WPI_TalonSRX talon, int atPosition) {
@@ -121,7 +124,8 @@ public class ElevatorSubsystem extends Subsystem {
 	 * {@inheritDoc}
 	 */
 	public void initDefaultCommand() {
-		// So far, no need for a default command.
+		System.out.println("init default command");
+		setDefaultCommand(new ManualElevatorCommand());
 	}
 
 	/**

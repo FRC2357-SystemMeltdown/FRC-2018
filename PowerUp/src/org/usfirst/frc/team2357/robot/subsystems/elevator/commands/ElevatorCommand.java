@@ -8,7 +8,7 @@ import org.usfirst.frc.team2357.robot.subsystems.elevator.ElevatorSubsystem;
 /**
  * The command to run the elevator manually. Hopefully we never need it.
  */
-public class ManualElevatorCommand extends AbstractStateCommand {
+public class ElevatorCommand extends AbstractStateCommand {
 	/**
 	 * The subsystem can and should be initialized in the constructor since the
 	 * subsystems are the first thing created during robot initialization and we
@@ -23,11 +23,13 @@ public class ManualElevatorCommand extends AbstractStateCommand {
 	 * field is put off until {@link #initialize()}.
 	 */
 	private /* final */ OI oi;
+	private double speed;
 
-	public ManualElevatorCommand() {
+	public ElevatorCommand(double d) {
 		System.out.println("ELevator command init");
 		this.elevatorSubsystem = Robot.getInstance().getElevatorSubsystem();
 		requires(this.elevatorSubsystem);
+		this.speed = d;
 	}
 
 	@Override
@@ -39,7 +41,7 @@ public class ManualElevatorCommand extends AbstractStateCommand {
 	@Override
 	protected void execute() {
 		super.execute();
-		this.elevatorSubsystem.manualMovement(oi.getManualElevatorSpeed());
+		this.elevatorSubsystem.manualMovement(speed);
 	}
 
 	@Override
